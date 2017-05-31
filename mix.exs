@@ -29,6 +29,8 @@ defmodule Routemaster.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:espec, "~> 1.4", only: :test}
+    ]
   end
 end
