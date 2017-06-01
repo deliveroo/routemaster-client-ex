@@ -7,7 +7,7 @@ defmodule Routemaster.Config do
   ]
 
   def redis_config do
-    case Application.get_env(:routemaster_client, :redis, []) do
+    case Application.get_env(:routemaster, :redis, []) do
       uri  when is_binary(uri) ->
         uri
       opts when is_list(opts) ->

@@ -3,7 +3,7 @@ defmodule Routemaster.Mixfile do
 
   def project do
     [
-      app: :routemaster_client,
+      app: :routemaster,
       version: "0.1.0",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,

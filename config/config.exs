@@ -7,6 +7,6 @@ use Mix.Config
 # 3rd-party users, it should be done in your "mix.exs" file.
 
 
-config :routemaster_client, :redis, [
+config :routemaster, :redis, [
   host: "localhost", port: 6379, database: 0
 ]
