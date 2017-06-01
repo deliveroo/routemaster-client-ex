@@ -27,7 +27,7 @@ defmodule Routemaster.ConfigSpec do
       it "contains some connection settings" do
         expect(subject()[:host]) |> to(eq "localhost")
         expect(subject()[:port]) |> to(eq 6379)
-        expect(subject()[:database]) |> to(eq 0)
+        expect(subject()[:database]) |> to(eq 5)
       end
     end
 

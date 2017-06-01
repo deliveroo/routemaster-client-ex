@@ -10,3 +10,10 @@ use Mix.Config
 config :routemaster, :redis, [
   host: "localhost", port: 6379, database: 0
 ]
+
+
+
+case Mix.env do
+  :test -> import_config "test.exs"
+  _     -> nil
+end
