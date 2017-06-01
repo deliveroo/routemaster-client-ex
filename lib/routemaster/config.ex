@@ -6,6 +6,11 @@ defmodule Routemaster.Config do
     database: 0,
   ]
 
+  @doc """
+  Returns the connection condfiguration for Redis.
+  It could be either a Keyword List of parameters or a
+  binary URI.
+  """
   def redis_config do
     case Application.get_env(:routemaster, :redis, []) do
       uri  when is_binary(uri) ->

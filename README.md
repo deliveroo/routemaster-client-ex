@@ -45,6 +45,14 @@ $ mix local.hex
 $ mix local.rebar
 ```
 
+### Install Redis
+
+This project depends on Redis. There are a number of ways to install it, for example:
+```
+$ brew update
+$ brew install redis
+```
+
 ### Setup the project
 
 Clone the repo, then install the dependencies:
@@ -69,6 +77,14 @@ Elixir applications are managed with the `mix` executable. Mix is a build tool, 
 
 The `elixir` and `elixirc` executables are also available, but they're considered low-level tools that are not used directly when working with structured applications.
 
+### Start Redis
+
+Redis is a runtime requirement. In the development and test environment the client will try to connect to the default Redis port on localhost. Just run it with:
+
+```
+$ redis-server
+```
+
 ### Terminal commands
 
 To start a REPL console:
@@ -84,6 +100,8 @@ This works a lot like `rails console` or `bin/console` in a Ruby gem. You can al
 Unless explicitly set, commands will run in the development environment (`MIX_ENV=dev`).
 
 ## Test
+
+The test suite needs Redis running on localhost. Start it, then run:
 
 ```
 $ mix espec
