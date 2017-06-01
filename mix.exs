@@ -10,6 +10,7 @@ defmodule Routemaster.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       preferred_cli_env: [espec: :test],
+      elixirc_paths: elixirc_paths(Mix.env),
     ]
   end
 
@@ -37,4 +38,7 @@ defmodule Routemaster.Mixfile do
       {:redix, "~> 0.6.1"},
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "spec/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 end
