@@ -3,13 +3,14 @@ defmodule Routemaster.Mixfile do
 
   def project do
     [
-      app: :routemaster_client,
+      app: :routemaster,
       version: "0.1.0",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
       preferred_cli_env: [espec: :test],
+      elixirc_paths: elixirc_paths(Mix.env),
     ]
   end
 
@@ -33,7 +34,11 @@ defmodule Routemaster.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:espec, "~> 1.4", only: :test}
+      {:espec, "~> 1.4", only: :test},
+      {:redix, "~> 0.6.1"},
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "spec/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 end
