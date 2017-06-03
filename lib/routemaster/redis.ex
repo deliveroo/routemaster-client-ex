@@ -27,6 +27,13 @@ defmodule Routemaster.Redis do
     Redix.command @conn, ["SET", key(key), value]
   end
 
+  def setex(key, seconds, value) do
+    Redix.command @conn, ["SETEX", key(key), seconds, value]
+  end
+
+  def ttl(key) do
+    Redix.command @conn, ["TTL", key(key)]
+  end
 
   defp key(base) do
     @prefix <> to_string(base)
