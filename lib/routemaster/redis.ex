@@ -20,22 +20,33 @@ defmodule Routemaster.Redis do
 
 
   def get(key) do
-    Redix.command @conn, ["GET", key(key)]
+    Redix.command @conn, ["GET", ns(key)]
   end
 
   def set(key, value) do
-    Redix.command @conn, ["SET", key(key), value]
+    Redix.command @conn, ["SET", ns(key), value]
   end
 
   def setex(key, seconds, value) do
-    Redix.command @conn, ["SETEX", key(key), seconds, value]
+    Redix.command @conn, ["SETEX", ns(key), seconds, value]
   end
 
   def ttl(key) do
-    Redix.command @conn, ["TTL", key(key)]
+    Redix.command @conn, ["TTL", ns(key)]
   end
 
-  defp key(base) do
+  def del(keys) when is_list(keys) do
+    key_list = Enum.map(keys, &ns/1)
+    Redix.command @conn, ["DEL" | key_list]
+  end
+
+  def del(key) do
+    Redix.command @conn, ["DEL", ns(key)]
+  end
+
+  # Namespace keys
+  #
+  defp ns(base) do
     @prefix <> to_string(base)
   end
 end
