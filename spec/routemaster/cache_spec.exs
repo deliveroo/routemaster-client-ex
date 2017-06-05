@@ -43,6 +43,15 @@ defmodule Routemaster.CacheSpec do
         test_cache_with(:hullo)
       end
 
+      it "supports numbers" do
+        test_cache_with(42)
+        test_cache_with(13.37, :another_key)
+      end
+
+      it "supports booleans" do
+        test_cache_with(true)
+      end
+
       it "supports tuples" do
         test_cache_with({})
         test_cache_with({:ok, 1, "hello"}, :another_key)
@@ -51,6 +60,7 @@ defmodule Routemaster.CacheSpec do
       it "supports lists" do
         test_cache_with([])
         test_cache_with([1,2,3], :another_key)
+        test_cache_with([foo: "bar", baz: "qwe"], :yet_another_key)
       end
 
       it "supports maps" do
