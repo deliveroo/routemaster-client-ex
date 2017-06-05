@@ -1,7 +1,8 @@
 defmodule Routemaster.Cache do
   alias Routemaster.Redis
 
-  @ttl 60 # seconds
+  # todo: make this configurable or dynamic
+  @ttl 3600 # seconds
   @prefix "cache:"
 
   def read(key) do
