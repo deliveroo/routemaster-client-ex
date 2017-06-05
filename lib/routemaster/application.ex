@@ -9,7 +9,8 @@ defmodule Routemaster.Application do
     import Supervisor.Spec, warn: false
 
     children = [
-      Routemaster.Redis.worker_spec(),
+      Routemaster.Redis.worker_spec(:data),
+      Routemaster.Redis.worker_spec(:cache),
     ]
 
 

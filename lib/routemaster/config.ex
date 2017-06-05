@@ -19,4 +19,12 @@ defmodule Routemaster.Config do
         Keyword.merge(@default_redis_config, opts)
     end
   end
+
+  def redis_config(:cache) do
+    Keyword.merge(redis_config(), [database: 1])
+  end
+
+  def redis_config(:data) do
+    Keyword.merge(redis_config(), [database: 2])
+  end
 end
