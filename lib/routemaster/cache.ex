@@ -39,7 +39,10 @@ defmodule Routemaster.Cache do
 
 
   def clear(key) do
-    Redis.del(ns(key))
+    case Redis.del(ns(key)) do
+      {:ok, _n} -> :ok # n is 0 or 1
+      _ -> :error
+    end
   end
 
 
