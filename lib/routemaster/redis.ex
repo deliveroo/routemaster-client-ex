@@ -1,14 +1,13 @@
 defmodule Routemaster.Redis do
   @moduledoc """
-  This is the main interface to Redis.
+  This is the main interface to Redis, and it implements two functions
+  to get a reference to the two Redis stores: the persistent data store
+  and the cache store.
 
   Supported Redis commands should be implemented as public
-  functions of this module.
+  functions of this module, and will automaticallt be available on both
+  clients.
   """
-
-  # @conn __MODULE__
-  # @conn_options [name: @conn, sync_connect: false]
-  # @prefix "rm:"
 
   alias Routemaster.Config
 
@@ -19,7 +18,26 @@ defmodule Routemaster.Redis do
     worker(Redix, [Config.redis_config(type), [name: name, sync_connect: false]], [restart: :permanent, id: name])
   end
 
+  @doc """
+  Returns a redis connection to the persistent Redis store. The returned
+  term can be used to issue Redis commands.
+
+      iex> Routemaster.Redis.data.set(:foo, "bar")
+      {:ok, "OK"}
+      iex> Routemaster.Redis.data.get(:foo)
+      {:ok, "bar"}
+  """
   def data, do: __MODULE__.Data
+
+  @doc """
+  Returns a redis connection to the cache Redis store. The returned
+  term can be used to issue Redis commands.
+
+      iex> Routemaster.Redis.cache.set(:foo, "bar")
+      {:ok, "OK"}
+      iex> Routemaster.Redis.cache.get(:foo)
+      {:ok, "bar"}
+  """
   def cache, do: __MODULE__.Cache
 
   defmacro __using__(type) do
@@ -65,9 +83,11 @@ defmodule Routemaster.Redis do
 end
 
 defmodule Routemaster.Redis.Data do
+  @moduledoc false
   use Routemaster.Redis, :data
 end
 
 defmodule Routemaster.Redis.Cache do
+  @moduledoc false
   use Routemaster.Redis, :cache
 end

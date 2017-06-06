@@ -2,6 +2,11 @@ defmodule Routemaster.RedisSpec do
   use ESpec, shared: true
   import Routemaster.TestUtils
 
+  # This is an "abstract" ESpec module, and is really meant to be
+  # mixed into the concrete test modules defined at the end of the
+  # file. This shared approach is required because the two Redis
+  # stores implement the same API.
+
   before_all do: clear_all_redis_test_dbs()
   finally do: clear_redis_test_db(shared.redis)
 
@@ -136,9 +141,14 @@ defmodule Routemaster.RedisSpec do
   end
 end
 
+
+# These two modules are what actually "runs" the tests.
+
 defmodule Routemaster.RedisDataSpec do
   use ESpec
   alias Routemaster.Redis
+
+  doctest Routemaster.Redis
 
   before redis: Redis.data()
   it_behaves_like(Routemaster.RedisSpec)
