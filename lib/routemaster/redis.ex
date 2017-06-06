@@ -83,11 +83,19 @@ defmodule Routemaster.Redis do
 end
 
 defmodule Routemaster.Redis.Data do
-  @moduledoc false
+  @moduledoc """
+  This module provides access to the persistent data store Redis.
+
+  Access it through `Routemaster.Redis.data()`.
+  """
   use Routemaster.Redis, :data
 end
 
 defmodule Routemaster.Redis.Cache do
-  @moduledoc false
+  @moduledoc """
+  This module provides access to the cache Redis.
+
+  Access it through `Routemaster.Redis.cache()`.
+  """
   use Routemaster.Redis, :cache
 end
