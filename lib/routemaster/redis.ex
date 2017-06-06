@@ -27,6 +27,9 @@ defmodule Routemaster.Redis do
       @prefix "rm:#{unquote(type)}:"
       @conn String.to_atom("rm_#{unquote(type)}_redis")
 
+      @doc false
+      def conn, do: @conn
+
       def get(key) do
         Redix.command @conn, ["GET", ns(key)]
       end

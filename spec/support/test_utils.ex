@@ -1,13 +1,22 @@
 defmodule Routemaster.TestUtils do
-  @redis Routemaster.Redis
+  alias Routemaster.Redis
 
-  def clear_redis_test_db do
-    Redix.command!(@redis, ["KEYS", "rm:*"])
-    |> delete_keys()
+  def clear_all_redis_test_dbs do
+    [Redis.data.conn(), Redis.cache.conn()]
+    |> Enum.map(fn(conn) ->
+      Redix.command!(conn, ["KEYS", "rm:*"])
+      |> delete_keys(conn)
+    end)
   end
 
-  defp delete_keys([]), do: 0
-  defp delete_keys(keys) do
-    Redix.command!(@redis, ["DEL" | keys])
+  def clear_redis_test_db(redis) do
+    conn = redis.conn()
+    Redix.command!(conn, ["KEYS", "rm:*"])
+    |> delete_keys(conn)
+  end
+
+  defp delete_keys([], _conn), do: 0
+  defp delete_keys(keys, conn) do
+    Redix.command!(conn, ["DEL" | keys])
   end
 end

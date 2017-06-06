@@ -2,8 +2,8 @@ defmodule Routemaster.RedisSpec do
   use ESpec, shared: true
   import Routemaster.TestUtils
 
-  before_all do: clear_redis_test_db()
-  finally do: clear_redis_test_db()
+  before_all do: clear_all_redis_test_dbs()
+  finally do: clear_redis_test_db(shared.redis)
 
   let :redis, do: shared.redis
 
@@ -136,10 +136,18 @@ defmodule Routemaster.RedisSpec do
   end
 end
 
-defmodule Routemaster.RedisConcreteSpec do
+defmodule Routemaster.RedisDataSpec do
   use ESpec
   alias Routemaster.Redis
 
-  before redis: Redis
+  before redis: Redis.data()
+  it_behaves_like(Routemaster.RedisSpec)
+end
+
+defmodule Routemaster.RedisCacheSpec do
+  use ESpec
+  alias Routemaster.Redis
+
+  before redis: Redis.cache()
   it_behaves_like(Routemaster.RedisSpec)
 end
