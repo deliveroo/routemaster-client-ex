@@ -2,18 +2,18 @@ defmodule Routemaster.ConfigSpec do
   use ESpec
   alias Routemaster.Config
 
-  describe "redis_config" do
-    subject(Config.redis_config())
+  describe "redis_config(cache)" do
+    subject(Config.redis_config(:cache))
 
     before do
       # capture the initial configuration
-      initial_config = Application.get_env(:routemaster, :redis)
+      initial_config = Application.get_env(:routemaster, :redis_cache)
       {:shared, initial_config: initial_config}
     end
 
     finally do
       # restore the initial configuration
-      Mix.Config.persist(routemaster: [redis: shared.initial_config])
+      Mix.Config.persist(routemaster: [redis_cache: shared.initial_config])
     end
 
 
@@ -34,7 +34,7 @@ defmodule Routemaster.ConfigSpec do
     context "when configured with a string" do
       before do
         uri = "redis://42.42.42.42:1337/1"
-        Mix.Config.persist(routemaster: [redis: uri])
+        Mix.Config.persist(routemaster: [redis_cache: uri])
         {:shared, uri: uri}
       end
 
