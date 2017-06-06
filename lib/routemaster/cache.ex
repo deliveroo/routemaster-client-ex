@@ -1,12 +1,12 @@
 defmodule Routemaster.Cache do
-  alias Routemaster.Redis
 
   # todo: make this configurable or dynamic
   @ttl 3600 # seconds
   @prefix "cache:"
+  @redis Routemaster.Redis.cache()
 
   def read(key) do
-    case Redis.get(ns(key)) do
+    case @redis.get(ns(key)) do
       {:ok, nil} ->
         {:miss, nil}
       {:ok, data} ->
@@ -18,7 +18,7 @@ defmodule Routemaster.Cache do
 
 
   def write(key, term) do
-    case Redis.setex(ns(key), @ttl, serialize(term)) do
+    case @redis.setex(ns(key), @ttl, serialize(term)) do
       {:ok, "OK"} ->
         {:ok, term}
       {:error, _} = error ->
@@ -40,7 +40,7 @@ defmodule Routemaster.Cache do
 
 
   def clear(key) do
-    case Redis.del(ns(key)) do
+    case @redis.del(ns(key)) do
       {:ok, _n} -> :ok # n is 0 or 1
       _ -> :error
     end
