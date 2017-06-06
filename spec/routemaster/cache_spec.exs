@@ -3,6 +3,8 @@ defmodule Routemaster.CacheSpec do
   alias Routemaster.Cache
   import Routemaster.TestUtils
 
+  doctest Routemaster.Cache
+
   before_all do: clear_redis_test_db(Routemaster.Redis.cache())
   finally do: clear_redis_test_db(Routemaster.Redis.cache())
 
