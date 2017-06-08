@@ -3,8 +3,10 @@ defmodule Routemaster.CacheSpec do
   alias Routemaster.Cache
   import Routemaster.TestUtils
 
-  before_all do: clear_redis_test_db()
-  finally do: clear_redis_test_db()
+  doctest Routemaster.Cache
+
+  before_all do: clear_redis_test_db(Routemaster.Redis.cache())
+  finally do: clear_redis_test_db(Routemaster.Redis.cache())
 
   describe "reading and writing" do
     describe "read(key)" do

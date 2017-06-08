@@ -1,32 +1,38 @@
 defmodule Routemaster.RedisSpec do
-  use ESpec
-  alias Routemaster.Redis
+  use ESpec, shared: true
   import Routemaster.TestUtils
 
-  before_all do: clear_redis_test_db()
-  finally do: clear_redis_test_db()
+  # This is an "abstract" ESpec module, and is really meant to be
+  # mixed into the concrete test modules defined at the end of the
+  # file. This shared approach is required because the two Redis
+  # stores implement the same API.
+
+  before_all do: clear_all_redis_test_dbs()
+  finally do: clear_redis_test_db(shared.redis)
+
+  let :redis, do: shared.redis
 
   describe "redis commands" do
     describe "GET and SET" do
       context "with strings" do
         example "reading a non present value returns nil" do
-          expect Redis.get("foo") |> to(eq {:ok, nil})
+          expect redis().get("foo") |> to(eq {:ok, nil})
         end
 
         it "allows to read previously set key-values" do
-          expect Redis.set("foo", "bar") |> to(eq {:ok, "OK"})
-          expect Redis.get("foo") |> to(eq {:ok, "bar"})
+          expect redis().set("foo", "bar") |> to(eq {:ok, "OK"})
+          expect redis().get("foo") |> to(eq {:ok, "bar"})
         end
       end
 
       context "with atoms" do
         example "reading a non present value returns nil" do
-          expect Redis.get(:foo) |> to(eq {:ok, nil})
+          expect redis().get(:foo) |> to(eq {:ok, nil})
         end
 
         it "allows to read previously set key-values" do
-          expect Redis.set(:foo, "bar") |> to(eq {:ok, "OK"})
-          expect Redis.get(:foo) |> to(eq {:ok, "bar"})
+          expect redis().set(:foo, "bar") |> to(eq {:ok, "OK"})
+          expect redis().get(:foo) |> to(eq {:ok, "bar"})
         end
       end
     end
@@ -34,26 +40,26 @@ defmodule Routemaster.RedisSpec do
 
     describe "SETEX and TTL" do
       it "SETEX sets a key with an expiration TTL, in seconds" do
-        expect Redis.setex(:banana, 100, "some value") |> to(eq {:ok, "OK"})
-        {:ok, ttl} = Redis.ttl :banana
+        expect redis().setex(:banana, 100, "some value") |> to(eq {:ok, "OK"})
+        {:ok, ttl} = redis().ttl :banana
         expect(ttl) |> to(be_integer())
         expect(ttl) |> to(be_close_to 100, 1) # value, delta
       end
 
       specify "TTL returns -1 for keys without expiration" do
-        {:ok, "OK"} = Redis.set(:coconut, "coconut coconut")
-        expect Redis.ttl(:coconut) |> to(eq {:ok, -1})
+        {:ok, "OK"} = redis().set(:coconut, "coconut coconut")
+        expect redis().ttl(:coconut) |> to(eq {:ok, -1})
       end
     end
 
 
     describe "DEL" do
       describe "with a single key as argument" do
-        subject(Redis.del(:my_key))
+        subject(redis().del(:my_key))
 
         context "when the key doesn't exist" do
           before do
-            {:ok, value} = Redis.get(:my_key)
+            {:ok, value} = redis().get(:my_key)
             expect(value) |> to(be_nil())
           end
 
@@ -64,33 +70,33 @@ defmodule Routemaster.RedisSpec do
 
         context "when the key exists" do
           before do
-            {:ok, "OK"} = Redis.set(:my_key, "foobar")
-            {:ok, value} = Redis.get(:my_key)
+            {:ok, "OK"} = redis().set(:my_key, "foobar")
+            {:ok, value} = redis().get(:my_key)
             expect(value) |> to_not(be_nil())
           end
 
           it "deletes the key and returns 1" do
             expect(subject()) |> to(eq {:ok, 1})
 
-            {:ok, value} = Redis.get(:my_key)
+            {:ok, value} = redis().get(:my_key)
             expect(value) |> to(be_nil())
           end
         end
       end
 
       describe "with a list of keys as argument" do
-        subject(Redis.del([:foo, :bar, :baz]))
+        subject(redis().del([:foo, :bar, :baz]))
 
         context "when all keys exist" do
           before do
-            {:ok, "OK"} = Redis.set(:foo, "aaa")
-            {:ok, "OK"} = Redis.set(:bar, "bbb")
-            {:ok, "OK"} = Redis.set(:baz, "ccc")
+            {:ok, "OK"} = redis().set(:foo, "aaa")
+            {:ok, "OK"} = redis().set(:bar, "bbb")
+            {:ok, "OK"} = redis().set(:baz, "ccc")
 
             # automatic failure reporting for failed pattern matching
-            {:ok, "aaa"} = Redis.get(:foo)
-            {:ok, "bbb"} = Redis.get(:bar)
-            {:ok, "ccc"} = Redis.get(:baz)
+            {:ok, "aaa"} = redis().get(:foo)
+            {:ok, "bbb"} = redis().get(:bar)
+            {:ok, "ccc"} = redis().get(:baz)
           end
 
 
@@ -98,30 +104,30 @@ defmodule Routemaster.RedisSpec do
             expect(subject()) |> to(eq {:ok, 3})
 
             # automatic failure reporting for failed pattern matching
-            {:ok, nil} = Redis.get(:foo)
-            {:ok, nil} = Redis.get(:bar)
-            {:ok, nil} = Redis.get(:baz)
+            {:ok, nil} = redis().get(:foo)
+            {:ok, nil} = redis().get(:bar)
+            {:ok, nil} = redis().get(:baz)
           end
         end
 
         context "when only some keys exist" do
           before do
-            {:ok, "OK"} = Redis.set(:foo, "aaa")
-            {:ok, "OK"} = Redis.set(:baz, "ccc")
+            {:ok, "OK"} = redis().set(:foo, "aaa")
+            {:ok, "OK"} = redis().set(:baz, "ccc")
 
             # automatic failure reporting for failed pattern matching
-            {:ok, "aaa"} = Redis.get(:foo)
-            {:ok, nil} = Redis.get(:bar)
-            {:ok, "ccc"} = Redis.get(:baz)
+            {:ok, "aaa"} = redis().get(:foo)
+            {:ok, nil} = redis().get(:bar)
+            {:ok, "ccc"} = redis().get(:baz)
           end
 
           it "deletes the ones that exist and returns their count" do
             expect(subject()) |> to(eq {:ok, 2})
 
             # automatic failure reporting for failed pattern matching
-            {:ok, nil} = Redis.get(:foo)
-            {:ok, nil} = Redis.get(:bar)
-            {:ok, nil} = Redis.get(:baz)
+            {:ok, nil} = redis().get(:foo)
+            {:ok, nil} = redis().get(:bar)
+            {:ok, nil} = redis().get(:baz)
           end
         end
 
@@ -133,4 +139,25 @@ defmodule Routemaster.RedisSpec do
       end
     end
   end
+end
+
+
+# These two modules are what actually "runs" the tests.
+
+defmodule Routemaster.RedisDataSpec do
+  use ESpec
+  alias Routemaster.Redis
+
+  doctest Routemaster.Redis
+
+  before redis: Redis.data()
+  it_behaves_like(Routemaster.RedisSpec)
+end
+
+defmodule Routemaster.RedisCacheSpec do
+  use ESpec
+  alias Routemaster.Redis
+
+  before redis: Redis.cache()
+  it_behaves_like(Routemaster.RedisSpec)
 end

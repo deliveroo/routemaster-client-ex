@@ -36,6 +36,7 @@ defmodule Routemaster.Mixfile do
     [
       {:espec, "~> 1.4", only: :test},
       {:redix, "~> 0.6.1"},
+      {:ex_doc, "~> 0.16.1", only: :dev},
     ]
   end
 

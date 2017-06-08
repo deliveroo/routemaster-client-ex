@@ -1,52 +1,101 @@
 defmodule Routemaster.Redis do
   @moduledoc """
-  This is the main interface to Redis.
+  This is the main interface to Redis, and it implements two functions
+  to get a reference to the two Redis stores: the persistent data store
+  and the cache store.
 
   Supported Redis commands should be implemented as public
-  functions of this module.
+  functions of this module, and will automaticallt be available on both
+  clients.
   """
-
-  @conn __MODULE__
-  @conn_options [name: @conn, sync_connect: false]
-  @prefix "rm:"
 
   alias Routemaster.Config
 
   @doc false
-  def worker_spec do
+  def worker_spec(type) do
     import Supervisor.Spec, only: [worker: 3]
-    worker(Redix, [Config.redis_config(), @conn_options], [restart: :permanent])
+    name = String.to_atom("rm_#{type}_redis")
+    worker(Redix, [Config.redis_config(type), [name: name, sync_connect: false]], [restart: :permanent, id: name])
   end
 
+  @doc """
+  Returns a redis connection to the persistent Redis store. The returned
+  term can be used to issue Redis commands.
 
-  def get(key) do
-    Redix.command @conn, ["GET", ns(key)]
-  end
+      iex> Routemaster.Redis.data.set(:foo, "bar")
+      {:ok, "OK"}
+      iex> Routemaster.Redis.data.get(:foo)
+      {:ok, "bar"}
+  """
+  def data, do: __MODULE__.Data
 
-  def set(key, value) do
-    Redix.command @conn, ["SET", ns(key), value]
-  end
+  @doc """
+  Returns a redis connection to the cache Redis store. The returned
+  term can be used to issue Redis commands.
 
-  def setex(key, seconds, value) do
-    Redix.command @conn, ["SETEX", ns(key), seconds, value]
-  end
+      iex> Routemaster.Redis.cache.set(:foo, "bar")
+      {:ok, "OK"}
+      iex> Routemaster.Redis.cache.get(:foo)
+      {:ok, "bar"}
+  """
+  def cache, do: __MODULE__.Cache
 
-  def ttl(key) do
-    Redix.command @conn, ["TTL", ns(key)]
-  end
+  defmacro __using__(type) do
+    quote do
+      @prefix "rm:#{unquote(type)}:"
+      @conn String.to_atom("rm_#{unquote(type)}_redis")
 
-  def del(keys) when is_list(keys) do
-    key_list = Enum.map(keys, &ns/1)
-    Redix.command @conn, ["DEL" | key_list]
-  end
+      @doc false
+      def conn, do: @conn
 
-  def del(key) do
-    Redix.command @conn, ["DEL", ns(key)]
-  end
+      def get(key) do
+        Redix.command @conn, ["GET", ns(key)]
+      end
 
-  # Namespace keys
-  #
-  defp ns(base) do
-    @prefix <> to_string(base)
+      def set(key, value) do
+        Redix.command @conn, ["SET", ns(key), value]
+      end
+
+      def setex(key, seconds, value) do
+        Redix.command @conn, ["SETEX", ns(key), seconds, value]
+      end
+
+      def ttl(key) do
+        Redix.command @conn, ["TTL", ns(key)]
+      end
+
+      def del(keys) when is_list(keys) do
+        key_list = Enum.map(keys, &ns/1)
+        Redix.command @conn, ["DEL" | key_list]
+      end
+
+      def del(key) do
+        Redix.command @conn, ["DEL", ns(key)]
+      end
+
+      # Namespace keys
+      #
+      defp ns(base) do
+        @prefix <> to_string(base)
+      end
+    end
   end
+end
+
+defmodule Routemaster.Redis.Data do
+  @moduledoc """
+  This module provides access to the persistent data store Redis.
+
+  Access it through `Routemaster.Redis.data()`.
+  """
+  use Routemaster.Redis, :data
+end
+
+defmodule Routemaster.Redis.Cache do
+  @moduledoc """
+  This module provides access to the cache Redis.
+
+  Access it through `Routemaster.Redis.cache()`.
+  """
+  use Routemaster.Redis, :cache
 end

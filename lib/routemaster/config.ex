@@ -11,8 +11,19 @@ defmodule Routemaster.Config do
   It could be either a Keyword List of parameters or a
   binary URI.
   """
-  def redis_config do
-    case Application.get_env(:routemaster, :redis, []) do
+  def redis_config(type)
+
+  def redis_config(:cache) do
+    read_redis_config(:redis_cache)
+  end
+
+  def redis_config(:data) do
+    read_redis_config(:redis_data)
+  end
+
+
+  defp read_redis_config(key) do
+    case Application.get_env(:routemaster, key, []) do
       uri  when is_binary(uri) ->
         uri
       opts when is_list(opts) ->
