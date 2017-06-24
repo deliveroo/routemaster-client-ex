@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain do
+defmodule Routemaster.Drain.App do
   @moduledoc """
     A Plug to receive events over HTTP.
   """
