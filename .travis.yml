@@ -1,0 +1,15 @@
+dist: trusty
+language: elixir
+elixir:
+  - 1.4
+otp_release:
+  - 20.0
+  - 19.3
+services:
+  - redis-server
+script:
+  - mix espec
+notifications:
+  email:
+    on_success: never
+    on_failure: never
