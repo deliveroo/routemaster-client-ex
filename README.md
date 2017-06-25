@@ -9,13 +9,14 @@ The project is a work in progress and it aims to port the functionality of the R
 
 ## Project organization
 
-The package is organized in three main functional areas:
+The package is organized in four main functional areas:
 
 * `Routemaster.Drain`, a [Plug](https://github.com/elixir-lang/plug) that provides an endpoint to receive events over HTTP.
 * `Routemaster.Fetcher`, a HATEOAS API client to get entities from other services.
 * `Routemaster.Publisher`, a module to publish events to the event bus.
+* `Routemaster.Director`, an interface to subscribe to topics, unsubscribe, list and delete (owned) topics, and in general interact with the API of the server.
 
-The initial milestone is to implement an event receiver close in functionality to the _caching_ Rack app from the Ruby drain, with a cache store that is shared between the the event receiver and the `Fetcher` API client.
+The initial milestone is to implement an event receiver close in functionality to the _caching_ Rack app from the Ruby drain, with a cache store that is shared between the `Drain` event receiver and the `Fetcher` API client.
 
 ## Development Setup
 
