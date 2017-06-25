@@ -2,7 +2,6 @@ defmodule Routemaster.Drain.App do
   @moduledoc """
     A Plug to receive events over HTTP.
   """
-  alias Plug.Parsers.UnsupportedMediaTypeError
 
   use Plug.Router
 
@@ -18,7 +17,7 @@ defmodule Routemaster.Drain.App do
   use Plug.ErrorHandler
 
 
-  # Parse JSON bodies and automaticaly reject non-JSON requests
+  # Parse JSON bodies and automatically reject non-JSON requests
   # with a 415 response.
   plug Plug.Parsers, parsers: [:json], json_decoder: Poison
 
@@ -49,13 +48,22 @@ defmodule Routemaster.Drain.App do
   end
 
 
+  # Either:
+  #  - Plug.Parsers.UnsupportedMediaTypeError
+  #    The request content-type is not JSON.
+  #    Status: 415
+  #  - Plug.Parsers.ParseError
+  #    The request body is not valid JSON
+  #    Status: 400
+  #
   # This should not normally happen, and it's ok to handle this
   # with an exception despite the performance hit. The alternative,
   # that is being defensive and checking the content-type for each
   # request, is likely going to have a higher performance impact.
   #
-  defp handle_errors(conn, %{kind: :error, reason: %UnsupportedMediaTypeError{media_type: _wrong_type}, stack: _}) do
-    send_resp(conn, 415, "")
+  defp handle_errors(conn, %{kind: :error, reason: %{plug_status: status}, stack: _}) do
+    send_resp(conn, status, "")
   end
+
   defp handle_errors(conn, _), do: conn
 end

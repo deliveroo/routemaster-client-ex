@@ -83,6 +83,32 @@ defmodule Routemaster.Drain.AppSpec do
         expect body |> to(be_empty())
       end
     end
+
+
+    describe "for POST requests with invalid JSON" do
+      let :path, do: "/"
+      let :payload, do: "[{}invalid json!]"
+
+      let :conn do
+        the_conn = 
+          conn("POST", path(), payload())
+          |> put_req_header("content-type", "application/json")
+
+        try do
+          App.call(the_conn, @opts)
+        rescue Plug.Parsers.ParseError -> nil
+        end
+
+        the_conn
+      end
+
+      it "responds with 400" do
+        {status, _headers, body} = sent_resp(conn())
+
+        expect status |> to(eq 400)
+        expect body |> to(be_empty())
+      end
+    end
   end
 
 
