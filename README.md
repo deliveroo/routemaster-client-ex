@@ -1,5 +1,7 @@
 # Routemaster Client
 
+[![Build Status](https://travis-ci.com/deliveroo/routemaster-client-ex.svg?token=Jy3hr8CUxbxU6EhNeGRq&branch=master)](https://travis-ci.com/deliveroo/routemaster-client-ex)
+
 This Elixir package is a client for the [Routemaster](https://github.com/deliveroo/routemaster) event bus server application.
 
 The project is a work in progress and it aims to port the functionality of the Ruby clients, [routemaster-drain](https://github.com/deliveroo/routemaster-drain) and [routemaster-client](https://github.com/deliveroo/routemaster-client).
