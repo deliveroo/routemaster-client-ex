@@ -10,6 +10,8 @@ defmodule Routemaster.Drain.AppSpec do
   describe "for valid requests (POST requests to the root path)" do
     let :path, do: "/"
     let :conn, do: post!(path(), payload())
+    # JSON bodies with root-level arrays are put in a _json field
+    let :decoded_json, do: conn().params["_json"]
 
     context "with no events" do
       let :payload, do: "[]"
@@ -17,6 +19,10 @@ defmodule Routemaster.Drain.AppSpec do
       it "responds with 204 and no body" do
         expect conn().status |> to(eq 204)
         expect conn().resp_body |> to(be_empty())
+      end
+
+      it "parses and decodes the JSON" do
+        expect decoded_json() |> to(eq [])
       end
     end
 
