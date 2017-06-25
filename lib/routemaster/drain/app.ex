@@ -7,8 +7,6 @@ defmodule Routemaster.Drain.App do
   use Plug.Router
 
   if Mix.env == :dev do
-    use Plug.Debugger, otp_app: :routemaster
-
     # Only log in dev, as the host application already
     # takes care of request loggins in production.
     plug Plug.Logger, log: :debug
