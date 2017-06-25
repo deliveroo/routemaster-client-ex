@@ -2,9 +2,9 @@ defmodule Routemaster.Drain.App do
   @moduledoc """
     A Plug to receive events over HTTP.
   """
+  alias Plug.Parsers.UnsupportedMediaTypeError
 
   use Plug.Router
-
 
   if Mix.env == :dev do
     use Plug.Debugger, otp_app: :routemaster
@@ -14,14 +14,15 @@ defmodule Routemaster.Drain.App do
     plug Plug.Logger, log: :debug
   end
 
+  # Invokes `handle_errors/2` callbacks to handle errors and exceptions.
+  # After the callbacks are invoked the errors are re-raised.
+  # Must be use'd after the debugger.
+  use Plug.ErrorHandler
 
-  # reject with 415 non-json requests
-  plug :only_accept_json
 
-
-  # Enable to decode JSON bodies
-  # plug Plug.Parsers, parsers: [:json]
-
+  # Parse JSON bodies and automaticaly reject non-JSON requests
+  # with a 415 response.
+  plug Plug.Parsers, parsers: [:json], json_decoder: Poison
 
   # required by Plug
   plug :match
@@ -50,19 +51,13 @@ defmodule Routemaster.Drain.App do
   end
 
 
-  defp only_accept_json(conn, _opts) do
-    if get_req_content_type(conn) == "application/json" do
-      conn
-    else
-      conn |> send_resp(415, "") |> halt()
-    end
+  # This should not normally happen, and it's ok to handle this
+  # with an exception despite the performance hit. The alternative,
+  # that is being defensive and checking the content-type for each
+  # request, is likely going to have a higher performance impact.
+  #
+  defp handle_errors(conn, %{kind: :error, reason: %UnsupportedMediaTypeError{media_type: _wrong_type}, stack: _}) do
+    send_resp(conn, 415, "")
   end
-
-
-  defp get_req_content_type(conn) do
-    conn
-    |> get_req_header("content-type")
-    |> hd()
-    |> String.downcase()
-  end
+  defp handle_errors(conn, _), do: conn
 end

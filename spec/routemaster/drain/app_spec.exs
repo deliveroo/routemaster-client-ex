@@ -64,14 +64,23 @@ defmodule Routemaster.Drain.AppSpec do
       let :payload, do: "foo=bar"
 
       let :conn do
-        conn("POST", path(), payload())
-        |> put_req_header("content-type", "application/x-www-form-urlencoded")
-        |> App.call(@opts)
+        the_conn = 
+          conn("POST", path(), payload())
+          |> put_req_header("content-type", "application/x-www-form-urlencoded")
+
+        try do
+          App.call(the_conn, @opts)
+        rescue Plug.Parsers.UnsupportedMediaTypeError -> nil
+        end
+
+        the_conn
       end
 
       it "responds with 415" do
-        expect conn().status |> to(eq 415)
-        expect conn().resp_body |> to(be_empty())
+        {status, _headers, body} = sent_resp(conn())
+
+        expect status |> to(eq 415)
+        expect body |> to(be_empty())
       end
     end
   end
