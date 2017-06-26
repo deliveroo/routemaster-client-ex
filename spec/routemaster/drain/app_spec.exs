@@ -2,7 +2,9 @@ defmodule Routemaster.Drain.AppSpec do
   use ESpec
   use Plug.Test
 
+  import Routemaster.TestUtils
   alias Routemaster.Drain.App
+  alias Routemaster.Drain.Event
 
   @opts App.init([])
 
@@ -23,6 +25,29 @@ defmodule Routemaster.Drain.AppSpec do
 
       it "parses and decodes the JSON" do
         expect decoded_json() |> to(eq [])
+      end
+    end
+
+    context "with some events" do
+      let :payload, do: "[#{make_drain_event(1)},#{make_drain_event(2)}]"
+
+      it "responds with 204 and no body" do
+        expect conn().status |> to(eq 204)
+        expect conn().resp_body |> to(be_empty())
+      end
+
+      it "parses and decodes the JSON" do
+        [e1, e2] = decoded_json()
+
+        expect e1 |> to(be_struct Event)
+        expect e2 |> to(be_struct Event)
+
+        # See `make_drain_event/1` for details.
+        %Event{data: nil, t: t1, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/1"} = e1
+        %Event{data: nil, t: t2, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/2"} = e2
+
+        expect t1 |> to(be_close_to (now() - 2), 1)
+        expect t2 |> to(be_close_to (now() - 2), 1)
       end
     end
 

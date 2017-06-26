@@ -19,7 +19,7 @@ defmodule Routemaster.Drain.App do
 
   # Parse JSON bodies and automatically reject non-JSON requests
   # with a 415 response.
-  plug Plug.Parsers, parsers: [:json], json_decoder: Poison
+  plug Plug.Parsers, parsers: [:json], json_decoder: Routemaster.Drain.JsonDecoder
 
   # required by Plug
   plug :match

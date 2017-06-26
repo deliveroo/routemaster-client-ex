@@ -19,4 +19,14 @@ defmodule Routemaster.TestUtils do
   defp delete_keys(keys, conn) do
     Redix.command!(conn, ["DEL" | keys])
   end
+
+  def now do
+    DateTime.utc_now() |> DateTime.to_unix()
+  end
+
+  def make_drain_event(index) do
+    ~s({"type":"update","topic":"dinosaurs","url":"https://example.com/dinosaurs/#{index}","t":#{now() - 2}})
+  end
+  # def make_drain_event(index, data) do
+  # end
 end
