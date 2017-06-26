@@ -13,7 +13,7 @@ defmodule Routemaster.Drain.AppSpec do
     let :path, do: "/"
     let :conn, do: post!(path(), payload())
     # JSON bodies with root-level arrays are put in a _json field
-    let :decoded_json, do: conn().params["_json"]
+    let :decoded_json, do: conn().assigns.events
 
     context "with no events" do
       let :payload, do: "[]"

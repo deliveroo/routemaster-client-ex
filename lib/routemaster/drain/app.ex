@@ -4,6 +4,7 @@ defmodule Routemaster.Drain.App do
   """
 
   use Plug.Router
+  alias Routemaster.Drain
 
   if Mix.env == :dev do
     # Only log in dev, as the host application already
@@ -17,9 +18,8 @@ defmodule Routemaster.Drain.App do
   use Plug.ErrorHandler
 
 
-  # Parse JSON bodies and automatically reject non-JSON requests
-  # with a 415 response.
-  plug Plug.Parsers, parsers: [:json], json_decoder: Routemaster.Drain.JsonDecoder
+  # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
+  plug Drain.Plugs.Parser
 
   # required by Plug
   plug :match
