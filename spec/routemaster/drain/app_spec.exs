@@ -2,7 +2,9 @@ defmodule Routemaster.Drain.AppSpec do
   use ESpec
   use Plug.Test
 
+  import Routemaster.TestUtils
   alias Routemaster.Drain.App
+  alias Routemaster.Drain.Event
 
   @opts App.init([])
 
@@ -10,6 +12,8 @@ defmodule Routemaster.Drain.AppSpec do
   describe "for valid requests (POST requests to the root path)" do
     let :path, do: "/"
     let :conn, do: post!(path(), payload())
+    # JSON bodies with root-level arrays are put in a _json field
+    let :decoded_json, do: conn().assigns.events
 
     context "with no events" do
       let :payload, do: "[]"
@@ -17,6 +21,33 @@ defmodule Routemaster.Drain.AppSpec do
       it "responds with 204 and no body" do
         expect conn().status |> to(eq 204)
         expect conn().resp_body |> to(be_empty())
+      end
+
+      it "parses and decodes the JSON" do
+        expect decoded_json() |> to(eq [])
+      end
+    end
+
+    context "with some events" do
+      let :payload, do: "[#{make_drain_event(1)},#{make_drain_event(2)}]"
+
+      it "responds with 204 and no body" do
+        expect conn().status |> to(eq 204)
+        expect conn().resp_body |> to(be_empty())
+      end
+
+      it "parses and decodes the JSON" do
+        [e1, e2] = decoded_json()
+
+        expect e1 |> to(be_struct Event)
+        expect e2 |> to(be_struct Event)
+
+        # See `make_drain_event/1` for details.
+        %Event{data: nil, t: t1, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/1"} = e1
+        %Event{data: nil, t: t2, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/2"} = e2
+
+        expect t1 |> to(be_close_to (now() - 2), 1)
+        expect t2 |> to(be_close_to (now() - 2), 1)
       end
     end
 
@@ -64,14 +95,49 @@ defmodule Routemaster.Drain.AppSpec do
       let :payload, do: "foo=bar"
 
       let :conn do
-        conn("POST", path(), payload())
-        |> put_req_header("content-type", "application/x-www-form-urlencoded")
-        |> App.call(@opts)
+        the_conn = 
+          conn("POST", path(), payload())
+          |> put_req_header("content-type", "application/x-www-form-urlencoded")
+
+        try do
+          App.call(the_conn, @opts)
+        rescue Plug.Parsers.UnsupportedMediaTypeError -> nil
+        end
+
+        the_conn
       end
 
       it "responds with 415" do
-        expect conn().status |> to(eq 415)
-        expect conn().resp_body |> to(be_empty())
+        {status, _headers, body} = sent_resp(conn())
+
+        expect status |> to(eq 415)
+        expect body |> to(be_empty())
+      end
+    end
+
+
+    describe "for POST requests with invalid JSON" do
+      let :path, do: "/"
+      let :payload, do: "[{}invalid json!]"
+
+      let :conn do
+        the_conn = 
+          conn("POST", path(), payload())
+          |> put_req_header("content-type", "application/json")
+
+        try do
+          App.call(the_conn, @opts)
+        rescue Plug.Parsers.ParseError -> nil
+        end
+
+        the_conn
+      end
+
+      it "responds with 400" do
+        {status, _headers, body} = sent_resp(conn())
+
+        expect status |> to(eq 400)
+        expect body |> to(be_empty())
       end
     end
   end

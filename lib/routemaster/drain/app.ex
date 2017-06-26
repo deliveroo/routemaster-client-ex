@@ -4,24 +4,22 @@ defmodule Routemaster.Drain.App do
   """
 
   use Plug.Router
-
+  alias Routemaster.Drain
 
   if Mix.env == :dev do
-    use Plug.Debugger, otp_app: :routemaster
-
     # Only log in dev, as the host application already
     # takes care of request loggins in production.
     plug Plug.Logger, log: :debug
   end
 
+  # Invokes `handle_errors/2` callbacks to handle errors and exceptions.
+  # After the callbacks are invoked the errors are re-raised.
+  # Must be use'd after the debugger.
+  use Plug.ErrorHandler
 
-  # reject with 415 non-json requests
-  plug :only_accept_json
 
-
-  # Enable to decode JSON bodies
-  # plug Plug.Parsers, parsers: [:json]
-
+  # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
+  plug Drain.Plugs.Parser
 
   # required by Plug
   plug :match
@@ -50,19 +48,22 @@ defmodule Routemaster.Drain.App do
   end
 
 
-  defp only_accept_json(conn, _opts) do
-    if get_req_content_type(conn) == "application/json" do
-      conn
-    else
-      conn |> send_resp(415, "") |> halt()
-    end
+  # Either:
+  #  - Plug.Parsers.UnsupportedMediaTypeError
+  #    The request content-type is not JSON.
+  #    Status: 415
+  #  - Plug.Parsers.ParseError
+  #    The request body is not valid JSON
+  #    Status: 400
+  #
+  # This should not normally happen, and it's ok to handle this
+  # with an exception despite the performance hit. The alternative,
+  # that is being defensive and checking the content-type for each
+  # request, is likely going to have a higher performance impact.
+  #
+  defp handle_errors(conn, %{kind: :error, reason: %{plug_status: status}, stack: _}) do
+    send_resp(conn, status, "")
   end
 
-
-  defp get_req_content_type(conn) do
-    conn
-    |> get_req_header("content-type")
-    |> hd()
-    |> String.downcase()
-  end
+  defp handle_errors(conn, _), do: conn
 end
