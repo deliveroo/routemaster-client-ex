@@ -93,10 +93,22 @@ $ redis-server
 To start a REPL console:
 
 ```
-$ iex -S mix
+$ bin/console
 ```
 
-This works a lot like `rails console` or `bin/console` in a Ruby gem. You can also just run `iex` to have the equivalent of `irb` or `pry`.
+This simply runs `iex -S mix`, which is "run the default mix task inside iex". It works a lot like `rails console` or `bin/console` in a Ruby gem. You can also just run `iex` to have the equivalent of `irb` or `pry`.
+
+To start a local **drain server** with attached REPL:
+
+```
+$ bin/drain
+```
+
+Once it's running, you can send it requests with:
+
+```
+$ curl -i --data "[]" -H "content-type: application/json" http://127.0.0.1:4000/
+```
 
 `mix` and `iex` processes will trap the first `SIGINT` they receive. To terminate them, use `^c` (<kbd>ctrl + c</kbd>) twice.
 
