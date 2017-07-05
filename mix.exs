@@ -41,6 +41,8 @@ defmodule Routemaster.Mixfile do
       {:tesla, "~> 0.7.1"},
       {:hackney, "~> 1.8"},
 
+      {:deferred_config, "~> 0.1.1"}, # https://github.com/mrluc/deferred_config
+
       {:espec, "~> 1.4", only: :test},
       {:ex_doc, "~> 0.16.1", only: :dev},
     ]
