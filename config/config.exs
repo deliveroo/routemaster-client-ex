@@ -7,13 +7,11 @@ use Mix.Config
 # 3rd-party users, it should be done in your "mix.exs" file.
 
 
-config :routemaster, :redis_cache, [
-  host: "localhost", port: 6379, database: 0
-]
+config :routemaster, :redis_cache,
+  {:system, "REDIS_CACHE_URL", "redis://localhost:6379/0"}
 
-config :routemaster, :redis_data, [
-  host: "localhost", port: 6379, database: 1
-]
+config :routemaster, :redis_data,
+  {:system, "REDIS_DATA_URL", "redis://localhost:6379/1"}
 
 
 case Mix.env do

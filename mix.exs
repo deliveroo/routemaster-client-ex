@@ -40,6 +40,7 @@ defmodule Routemaster.Mixfile do
       {:poison, "~> 3.1"},
       {:tesla, "~> 0.7.1"},
       {:hackney, "~> 1.8"},
+      {:deferred_config, "~> 0.1.1"},
 
       {:espec, "~> 1.4", only: :test},
       {:ex_doc, "~> 0.16.1", only: :dev},
