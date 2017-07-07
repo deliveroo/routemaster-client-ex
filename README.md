@@ -74,6 +74,14 @@ $ mix deps.compile
 
 Mix installs dependencies in the project directory, in `./deps/`. This is very similar to what `npm` does. The compiled Elixir bytecode lives in `./_build/`.
 
+## Configure
+
+This library is configured with [`Mix.Config`](https://hexdocs.pm/mix/Mix.Config.html#content). It supports Phoenix-style system tuples to dynamically read its configuration from the environment, which means that it can be configured at runtime (on boot) rather than at compile-time.
+
+Whil using the environment is optional, it's the recommended way to configure a [12-factor application](https://12factor.net/), and it allows to reuse the the compiled artifacts with different configurations.
+
+The [`config.exs` file](https://github.com/deliveroo/routemaster-client-ex/blob/master/config/config.exs) provides examples of the supported configuration variables.
+
 ## Run
 
 Elixir applications are managed with the `mix` executable. Mix is a build tool, a task runner, a package manager and more. It takes care of everything, from compiling to running the server and the tests to linting the code. The other important executable is `iex`, which stands for "interactive Elixir" and starts the REPL.
