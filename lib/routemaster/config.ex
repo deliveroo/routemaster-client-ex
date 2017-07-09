@@ -1,5 +1,7 @@
 defmodule Routemaster.Config do
   @moduledoc false
+  @app :routemaster
+
   @default_redis_config [
     host: "localhost",
     port: 6379,
@@ -23,11 +25,24 @@ defmodule Routemaster.Config do
 
 
   defp read_redis_config(key) do
-    case Application.get_env(:routemaster, key, []) do
+    case Application.get_env(@app, key, []) do
       uri  when is_binary(uri) ->
         uri
       opts when is_list(opts) ->
         Keyword.merge(@default_redis_config, opts)
     end
+  end
+
+
+  def bus_url do
+    Application.get_env(@app, :bus_url)
+  end
+
+  def api_token do
+    Application.get_env(@app, :api_token)
+  end
+
+  def client_token do
+    Application.get_env(@app, :client_token)
   end
 end

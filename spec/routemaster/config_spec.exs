@@ -43,4 +43,23 @@ defmodule Routemaster.ConfigSpec do
       end
     end
   end
+
+
+  describe "bus_url" do
+    it "returns a string" do
+      expect Config.bus_url |> to(eql "https://example.com")
+    end
+  end
+
+  describe "api_token" do
+    it "returns a string" do
+      expect Config.api_token |> to(eql "a-test-api-token")
+    end
+  end
+
+  describe "client_token" do
+    it "returns a string" do
+      expect Config.client_token |> to(eql "a-test-client-token")
+    end
+  end
 end
