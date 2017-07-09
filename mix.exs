@@ -43,6 +43,7 @@ defmodule Routemaster.Mixfile do
       {:deferred_config, "~> 0.1.1"},
 
       {:espec, "~> 1.4", only: :test},
+      {:bypass, "~> 0.7.0", only: :test},
       {:ex_doc, "~> 0.16.1", only: :dev},
     ]
   end
