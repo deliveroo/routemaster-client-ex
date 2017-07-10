@@ -29,4 +29,9 @@ defmodule Routemaster.TestUtils do
   end
   # def make_drain_event(index, data) do
   # end
+
+
+  def compact_string(str) do
+    String.replace(str, ~r/\s+/, "")
+  end
 end
