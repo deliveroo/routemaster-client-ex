@@ -47,7 +47,7 @@ defmodule Routemaster.ConfigSpec do
 
   describe "bus_url" do
     it "returns a string" do
-      expect Config.bus_url |> to(eql "https://example.com")
+      expect Config.bus_url |> to(eql "http://localhost:4567")
     end
   end
 
