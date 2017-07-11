@@ -5,7 +5,7 @@ defmodule Routemaster.Director do
   authenticated HTTP request to the even bus server.
   """
 
-  use Tesla
+  use Tesla, docs: false
 
   adapter Tesla.Adapter.Hackney
 
@@ -16,6 +16,7 @@ defmodule Routemaster.Director do
 
   plug Routemaster.Middleware.BaseUrl
   plug Routemaster.Middleware.BasicAuth
+  plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
   plug Tesla.Middleware.JSON
 
   # If enabled, this must be the innermost middleware in order
