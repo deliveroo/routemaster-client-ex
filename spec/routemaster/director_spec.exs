@@ -6,12 +6,12 @@ defmodule Routemaster.DirectorSpec do
   alias Plug.Conn
 
   before do
-    bypass = Bypass.open(:espec, port: 4567)
+    bypass = Bypass.open(port: 4567)
     {:shared, bypass: bypass}
   end
 
   finally do
-    Bypass.verify_expectations(:espec, shared.bypass)
+    Bypass.verify_expectations!(shared.bypass)
   end
 
   describe "topics() GETs a list of topics" do

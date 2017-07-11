@@ -1,4 +1,4 @@
-%{"bypass": {:git, "git@github.com:tompave/bypass.git", "575c3ea1185599fb6bc14cefa85356a9fd0b7c30", [branch: "espec"]},
+%{"bypass": {:git, "git@github.com:tompave/bypass.git", "fa2607aaf7c01a42bcbff319a7791951f6fb0767", [branch: "espec"]},
   "certifi": {:hex, :certifi, "1.2.1", "c3904f192bd5284e5b13f20db3ceac9626e14eeacfbb492e19583cf0e37b22be", [:rebar3], [], "hexpm"},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], [], "hexpm"},
   "cowboy": {:hex, :cowboy, "1.1.2", "61ac29ea970389a88eca5a65601460162d370a70018afe6f949a29dca91f3bb0", [:rebar3], [{:cowlib, "~> 1.0.2", [hex: :cowlib, repo: "hexpm", optional: false]}, {:ranch, "~> 1.3.2", [hex: :ranch, repo: "hexpm", optional: false]}], "hexpm"},

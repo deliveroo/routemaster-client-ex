@@ -2,6 +2,8 @@ use Mix.Config
 
 config :logger, level: :error
 
+config :bypass, framework: :espec
+
 config :routemaster, :redis_cache, [database: 5]
 config :routemaster, :redis_data, [database: 6]
 
