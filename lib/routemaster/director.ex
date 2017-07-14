@@ -31,15 +31,77 @@ defmodule Routemaster.Director do
 
   Example: 
 
-      case Director.topics() do
-        %{status: 200, body: topics} ->
-          IO.puts "The bus is handling #{length topics} topics"
-          {:ok, topics}
-        %{status: status} ->
-          {:error, status}
+      case Director.all_topics() do
+        {:ok, topics} ->
+          "The bus is handling #{length topics} topics"
+        {:error, status} ->
+          "Couldn't get topics, HTTP error #{status}"
       end
   """
-  def topics do
-    get("/topics")
+  def all_topics do
+    case get("/topics") do
+      %{status: 200, body: topics} ->
+        {:ok, topics}
+      %{status: status} ->
+        {:error, status}
+    end
+  end
+
+
+  @doc """
+  Returns a single topic, by name.
+  It will fetch all topics over the network and filter them locally.
+  """
+  def get_topic(name) do
+    case all_topics() do
+      {:ok, topics} ->
+        topic = Enum.find(topics, fn(t) -> t["name"] == name end)
+        {:ok, topic}
+      error -> error
+    end
+  end
+
+
+  @doc """
+  """
+  def subscribe(topics, callback, options) do
+    data = %{
+      topics: topics,
+      callback: callback,
+      max: options[:max],
+      timeout: options[:timeout],
+    }
+
+    post("/subscriptions", data)
+  end
+
+  @doc """
+  """
+  def unsubscribe(topics) when is_list(topics) do
+    Enum.each topics, &unsubscribe/1
+  end
+
+  def unsubscribe(topic) do
+    delete("/subscriber/topics/" <> topic)
+  end
+
+
+  @doc """
+  """
+  def unsubscribe_all do
+    delete("/subscriber")
+  end
+
+
+  @doc """
+  Deletes an owned topic from the bus server.
+  """
+  def delete_topic(topic) do
+    case delete("/topics/" <> topic) do
+      %{status: 204} ->
+        {:ok, nil}
+      %{status: status} ->
+        {:error, status}
+    end
   end
 end

@@ -14,7 +14,7 @@ defmodule Routemaster.DirectorSpec do
     Bypass.verify_expectations!(shared.bypass)
   end
 
-  describe "topics() GETs a list of topics" do
+  describe "all_topics() GETs a list of topics" do
     before do
       response_status = status()
       response_body = raw_body()
@@ -44,8 +44,8 @@ defmodule Routemaster.DirectorSpec do
       end
 
       it "returns a list of maps for a successful response" do
-        %Tesla.Env{status: 200, body: body} = Director.topics()
-        expect body |> to(eq parsed_body())
+        {:ok, topics} = Director.all_topics()
+        expect topics |> to(eq parsed_body())
       end  
     end
     
