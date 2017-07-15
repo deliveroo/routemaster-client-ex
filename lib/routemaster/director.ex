@@ -12,7 +12,9 @@ defmodule Routemaster.Director do
   # Make this the outermost middleare to calculate the timing
   # for the entire stack.
   #
-  plug Tesla.Middleware.Logger
+  unless Mix.env == :test do
+    plug Tesla.Middleware.Logger
+  end
 
   plug Routemaster.Middleware.BaseUrl
   plug Routemaster.Middleware.BasicAuth
@@ -29,7 +31,7 @@ defmodule Routemaster.Director do
   Retrieves the current topics from the server and their metadata.
   It performs a `GET /topics` request.
 
-  Example: 
+  Example:
 
       case Director.all_topics() do
         {:ok, topics} ->
@@ -63,6 +65,19 @@ defmodule Routemaster.Director do
 
 
   @doc """
+  Deletes an owned topic from the bus server.
+  """
+  def delete_topic(topic) do
+    case delete("/topics/" <> topic) do
+      %{status: 204} ->
+        {:ok, nil}
+      %{status: status} ->
+        {:error, status}
+    end
+  end
+
+
+  @doc """
   """
   def subscribe(topics, callback, options) do
     data = %{
@@ -90,18 +105,5 @@ defmodule Routemaster.Director do
   """
   def unsubscribe_all do
     delete("/subscriber")
-  end
-
-
-  @doc """
-  Deletes an owned topic from the bus server.
-  """
-  def delete_topic(topic) do
-    case delete("/topics/" <> topic) do
-      %{status: 204} ->
-        {:ok, nil}
-      %{status: status} ->
-        {:error, status}
-    end
   end
 end
