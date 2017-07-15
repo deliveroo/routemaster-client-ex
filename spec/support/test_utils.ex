@@ -21,7 +21,7 @@ defmodule Routemaster.TestUtils do
   end
 
   def now do
-    DateTime.utc_now() |> DateTime.to_unix()
+    Routemaster.Utils.now
   end
 
   def make_drain_event(index) do
