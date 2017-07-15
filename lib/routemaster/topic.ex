@@ -24,6 +24,7 @@ defmodule Routemaster.Topic do
 
 
   defmodule InvalidNameError do
+    @moduledoc false
     defexception [:message]
 
     def exception(name) do
