@@ -15,6 +15,20 @@ defmodule Routemaster.DirectorSpec do
     Bypass.verify_expectations!(shared.bypass)
   end
 
+  it "sets the correct user-agent HTTP header" do
+    Bypass.expect_once shared.bypass, "GET", "/topics", fn conn ->
+      [ua|[]] = Plug.Conn.get_req_header conn, "user-agent"
+      expect ua |> to(start_with "routemaster-client-ex-v")
+
+      conn
+      |> Conn.resp(200, "[]")
+      |> Conn.put_resp_content_type("application/json")
+    end
+
+    Director.all_topics() # just use any of the functions
+  end
+
+
   describe "all_topics() GETs a list of topics" do
     subject(Director.all_topics())
 

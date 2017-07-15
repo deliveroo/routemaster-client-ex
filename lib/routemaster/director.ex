@@ -22,6 +22,7 @@ defmodule Routemaster.Director do
   plug Routemaster.Middleware.BasicAuth
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
   plug Tesla.Middleware.JSON
+  plug Tesla.Middleware.Headers, %{"user-agent" => Config.user_agent}
 
   # If enabled, this must be the innermost middleware in order
   # to log all request headers and the raw response body.

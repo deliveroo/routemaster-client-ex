@@ -2,6 +2,12 @@ defmodule Routemaster.ConfigSpec do
   use ESpec
   alias Routemaster.Config
 
+  describe "user_agent()" do
+    it "returns a string" do
+      expect Config.user_agent |> to(start_with "routemaster-client-ex-v")
+    end
+  end
+
   describe "redis_config(cache)" do
     subject(Config.redis_config(:cache))
 

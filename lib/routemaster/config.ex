@@ -1,5 +1,8 @@
 defmodule Routemaster.Config do
-  @moduledoc false
+  @moduledoc """
+  Centralized access to the client configuration.
+  """
+
   @app :routemaster
 
   @default_redis_config [
@@ -7,6 +10,15 @@ defmodule Routemaster.Config do
     port: 6379,
     database: 0,
   ]
+
+  @user_agent "routemaster-client-ex-v#{Routemaster.Mixfile.version()}"
+
+  @doc """
+  The user-agent HTTP header used when talking with the bus server
+  and when fetching entities from their URLs.
+  """
+  def user_agent, do: @user_agent
+
 
   @doc """
   Returns the connection condfiguration for Redis.
