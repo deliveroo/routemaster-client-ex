@@ -102,12 +102,8 @@ defmodule Routemaster.Director do
   Subscribe to two topics, and dispatch events within 2 seconds, in batches
   no larger than 300 events:
 
-      Director.subscribe(
-        ~w(users orders),
-        "https://example.com/rm-events",
-        max: 300,
-        timeout: 2_000
-      )
+      Director.subscribe(~w(users orders), max: 300, timeout: 2_000)
+
   """
   def subscribe(topics, options \\ []) do
     Enum.each(topics, &validate_name!/1)
