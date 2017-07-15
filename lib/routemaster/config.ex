@@ -1,5 +1,8 @@
 defmodule Routemaster.Config do
-  @moduledoc false
+  @moduledoc """
+  Centralized access to the client configuration.
+  """
+
   @app :routemaster
 
   @default_redis_config [
@@ -7,6 +10,15 @@ defmodule Routemaster.Config do
     port: 6379,
     database: 0,
   ]
+
+  @user_agent "routemaster-client-ex-v#{Routemaster.Mixfile.version()}"
+
+  @doc """
+  The user-agent HTTP header used when talking with the bus server
+  and when fetching entities from their URLs.
+  """
+  def user_agent, do: @user_agent
+
 
   @doc """
   Returns the connection condfiguration for Redis.
@@ -48,5 +60,17 @@ defmodule Routemaster.Config do
 
   def drain_url do
     Application.get_env(@app, :drain_url)
+  end
+
+
+  @hackney_defaults [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
+
+  @doc """
+  Options passed to the `Director`'s `hackney` adapter.  
+  See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
+  for more details.
+  """
+  def director_http_options do
+    Application.get_env(@app, :director_http_options, @hackney_defaults)
   end
 end

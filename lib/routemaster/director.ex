@@ -9,7 +9,7 @@ defmodule Routemaster.Director do
   import Routemaster.Topic, only: [validate_name!: 1]
   alias Routemaster.Config
 
-  adapter Tesla.Adapter.Hackney
+  adapter Tesla.Adapter.Hackney, Config.director_http_options
 
   # Make this the outermost middleare to calculate the timing
   # for the entire stack.
@@ -22,6 +22,7 @@ defmodule Routemaster.Director do
   plug Routemaster.Middleware.BasicAuth
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
   plug Tesla.Middleware.JSON
+  plug Tesla.Middleware.Headers, %{"user-agent" => Config.user_agent}
 
   # If enabled, this must be the innermost middleware in order
   # to log all request headers and the raw response body.
@@ -101,12 +102,8 @@ defmodule Routemaster.Director do
   Subscribe to two topics, and dispatch events within 2 seconds, in batches
   no larger than 300 events:
 
-      Director.subscribe(
-        ~w(users orders),
-        "https://example.com/rm-events",
-        max: 300,
-        timeout: 2_000
-      )
+      Director.subscribe(~w(users orders), max: 300, timeout: 2_000)
+
   """
   def subscribe(topics, options \\ []) do
     Enum.each(topics, &validate_name!/1)

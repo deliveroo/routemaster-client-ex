@@ -2,6 +2,12 @@ defmodule Routemaster.ConfigSpec do
   use ESpec
   alias Routemaster.Config
 
+  describe "user_agent()" do
+    it "returns a string" do
+      expect Config.user_agent |> to(start_with "routemaster-client-ex-v")
+    end
+  end
+
   describe "redis_config(cache)" do
     subject(Config.redis_config(:cache))
 
@@ -67,5 +73,11 @@ defmodule Routemaster.ConfigSpec do
     it "returns a string" do
       expect Config.drain_url |> to(eql "http://drain-url.local/events")
     end
+  end
+
+  specify "director_http_options() returns some options for hackney" do
+    [{:recv_timeout, rec_t}, {:connect_timeout, con_t}] = Config.director_http_options
+    expect rec_t |> to(be_integer())
+    expect con_t |> to(be_integer())
   end
 end

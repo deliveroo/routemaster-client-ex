@@ -2,4 +2,4 @@
 
 source "bin/_load_config.sh";
 
-iex -S mix run -e "Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [])"
+iex -S mix run -e "Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [], port: 4000)"
