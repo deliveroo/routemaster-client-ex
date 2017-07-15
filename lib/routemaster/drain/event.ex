@@ -14,4 +14,14 @@ defmodule Routemaster.Drain.Event do
   """
 
   defstruct [:type, :url, :t, :data, :topic]
+
+  @required_fields [:type, :url, :t, :topic]
+
+
+  @doc """
+  Verifies if an event contains all the mandatory fields.
+  """
+  def complete?(event) do
+    Enum.all?(@required_fields, fn(field) -> Map.get(event, field) end)
+  end
 end

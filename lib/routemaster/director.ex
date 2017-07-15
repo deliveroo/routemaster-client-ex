@@ -34,7 +34,7 @@ defmodule Routemaster.Director do
   Retrieves the current topics from the server and their metadata.
   It performs a `GET /topics` request.
 
-  # Examples
+  ## Examples
 
       case Director.all_topics() do
         {:ok, topics} ->
@@ -97,7 +97,7 @@ defmodule Routemaster.Director do
     This indirectly controls the max latency of event delivery. Default: 500ms.
 
 
-  # Examples
+  ## Examples
 
   Subscribe to two topics, and dispatch events within 2 seconds, in batches
   no larger than 300 events:

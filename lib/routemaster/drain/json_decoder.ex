@@ -4,9 +4,6 @@ defmodule Routemaster.Drain.JsonDecoder do
   """
   alias Routemaster.Drain.Event
 
-  @required_fields [:t, :type, :topic, :url]
-
-
   defmodule InvalidPayloadError do
     @moduledoc false
     defexception [:message]
@@ -43,8 +40,6 @@ defmodule Routemaster.Drain.JsonDecoder do
 
   defp all_events_complete?([]), do: true
   defp all_events_complete?(list) do
-    Enum.all?(list, fn(event) ->
-      Enum.all?(@required_fields, fn(field) -> Map.get(event, field) end)
-    end)
+    Enum.all?(list, &Event.complete?/1)
   end
 end
