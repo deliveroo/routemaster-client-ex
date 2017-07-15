@@ -6,4 +6,6 @@ ESpec.configure fn(config) ->
   config.finally fn(_shared) ->
     :ok
   end
+
+  Application.ensure_all_started(:bypass)
 end

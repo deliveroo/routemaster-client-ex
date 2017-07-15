@@ -1,3 +1,5 @@
 #!/bin/bash
 
+source "bin/_load_config.sh";
+
 iex -S mix run -e "Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [])"

@@ -14,6 +14,19 @@ config :routemaster, :redis_data,
   {:system, "REDIS_DATA_URL", "redis://localhost:6379/1"}
 
 
+config :routemaster, :api_token,
+  {:system, "ROUTEMASTER_API_TOKEN"}
+
+config :routemaster, :client_token,
+  {:system, "ROUTEMASTER_CLIENT_TOKEN"}
+
+config :routemaster, :bus_url,
+  {:system, "ROUTEMASTER_URL"}
+
+config :routemaster, :drain_url,
+  {:system, "ROUTEMASTER_DRAIN_URL"}
+
+
 case Mix.env do
   :test -> import_config "test.exs"
   _     -> nil
