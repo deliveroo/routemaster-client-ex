@@ -45,4 +45,8 @@ defmodule Routemaster.Config do
   def client_token do
     Application.get_env(@app, :client_token)
   end
+
+  def drain_url do
+    Application.get_env(@app, :drain_url)
+  end
 end

@@ -23,6 +23,9 @@ config :routemaster, :client_token,
 config :routemaster, :bus_url,
   {:system, "ROUTEMASTER_URL"}
 
+config :routemaster, :drain_url,
+  {:system, "ROUTEMASTER_DRAIN_URL"}
+
 
 case Mix.env do
   :test -> import_config "test.exs"

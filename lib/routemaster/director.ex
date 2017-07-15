@@ -88,8 +88,6 @@ defmodule Routemaster.Director do
   * `topics`: a list of valid topic names. This must always be the complete
   set of topics this subscriber wants to receive, because any missing
   previously-submitted topics will see their subscriptions deleted.
-  * `callback`: a fully qualified https URL. This is where the drain will
-  receive the events.
   * options (optional):
     * `max`: How many events can be batched together on delivery. The server
     will never deliver batches larger than this number. Default: 100.
@@ -110,18 +108,18 @@ defmodule Routemaster.Director do
         timeout: 2_000
       )
   """
-  def subscribe(topics, callback, options \\ []) do
+  def subscribe(topics, options \\ []) do
     Enum.each(topics, &validate_name!/1)
 
     data = %{
       topics: topics,
-      callback: callback,
+      callback: Config.drain_url,
       uuid: Config.client_token,
       max: options[:max],
       timeout: options[:timeout]
     }
 
-    case post("/subscriptions", data) do
+    case post("/subscription", data) do
       %{status: 204} ->
         {:ok, nil}
       %{status: status} ->

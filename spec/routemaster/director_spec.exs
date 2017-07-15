@@ -187,14 +187,14 @@ defmodule Routemaster.DirectorSpec do
   describe "subscribe() subscribes to a list of topics" do
     describe "with an invalid topic name in the list" do
       it "raises an exception" do
-        expect fn() -> Director.subscribe(~w(duck Rabbits), "https://example.com/events") end
+        expect fn() -> Director.subscribe(~w(duck Rabbits)) end
         |> to(raise_exception Routemaster.Topic.InvalidNameError)
       end
     end
 
     describe "with valid topic names" do
       subject(
-        Director.subscribe ~w(ducks rabbits), "https://example.com/events", max: 42, timeout: 1_000
+        Director.subscribe ~w(ducks rabbits), max: 42, timeout: 1_000
       )
 
       before do
@@ -204,7 +204,7 @@ defmodule Routemaster.DirectorSpec do
           {:ok, data} = Poison.decode(body)
 
           expect data["topics"]   |> to(eq ~w(ducks rabbits))
-          expect data["callback"] |> to(eq "https://example.com/events")
+          expect data["callback"] |> to(eq "http://drain-url.local/events")
           expect data["uuid"]     |> to(eq Config.client_token)
           expect data["max"]      |> to(eq 42)
           expect data["timeout"]  |> to(eq 1_000)
