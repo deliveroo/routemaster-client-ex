@@ -3,6 +3,7 @@ defmodule Routemaster.DirectorSpec do
   import Routemaster.TestUtils
 
   alias Routemaster.Director
+  alias Routemaster.Config
   alias Plug.Conn
 
   before do
@@ -177,6 +178,55 @@ defmodule Routemaster.DirectorSpec do
 
         it "returns {:error, 403}" do
           expect subject() |> to(eq {:error, 403})
+        end
+      end
+    end
+  end
+
+
+  describe "subscribe() subscribes to a list of topics" do
+    describe "with an invalid topic name in the list" do
+      it "raises an exception" do
+        expect fn() -> Director.subscribe(~w(duck Rabbits), "https://example.com/events") end
+        |> to(raise_exception Routemaster.Topic.InvalidNameError)
+      end
+    end
+
+    describe "with valid topic names" do
+      subject(
+        Director.subscribe ~w(ducks rabbits), "https://example.com/events", max: 42, timeout: 1_000
+      )
+
+      before do
+        response_status = status()
+        Bypass.expect_once shared.bypass, "POST", "/subscriptions" , fn conn ->
+          {:ok, body, _} = Plug.Conn.read_body(conn)
+          {:ok, data} = Poison.decode(body)
+
+          expect data["topics"]   |> to(eq ~w(ducks rabbits))
+          expect data["callback"] |> to(eq "https://example.com/events")
+          expect data["uuid"]     |> to(eq Config.client_token)
+          expect data["max"]      |> to(eq 42)
+          expect data["timeout"]  |> to(eq 1_000)
+
+          Conn.resp(conn, response_status, "")
+        end
+      end
+
+
+      describe "with a successful response" do
+        let :status, do: 204
+
+        it "returns {:ok, nil}" do
+          expect subject() |> to(eq {:ok, nil})
+        end
+      end
+
+      context "with a NON successful response" do
+        let :status, do: 400
+
+        it "returns {:error, http_status}" do
+          expect subject() |> to(eq {:error, 400})
         end
       end
     end

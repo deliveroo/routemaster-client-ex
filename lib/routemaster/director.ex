@@ -7,6 +7,7 @@ defmodule Routemaster.Director do
 
   use Tesla, docs: false
   import Routemaster.Topic, only: [validate_name!: 1]
+  alias Routemaster.Config
 
   adapter Tesla.Adapter.Hackney
 
@@ -32,7 +33,7 @@ defmodule Routemaster.Director do
   Retrieves the current topics from the server and their metadata.
   It performs a `GET /topics` request.
 
-  Example:
+  # Examples
 
       case Director.all_topics() do
         {:ok, topics} ->
@@ -81,16 +82,51 @@ defmodule Routemaster.Director do
 
 
   @doc """
+  Creates a subscription on the bus server.
+  Arguments:
+
+  * `topics`: a list of valid topic names. This must always be the complete
+  set of topics this subscriber wants to receive, because any missing
+  previously-submitted topics will see their subscriptions deleted.
+  * `callback`: a fully qualified https URL. This is where the drain will
+  receive the events.
+  * options (optional):
+    * `max`: How many events can be batched together on delivery. The server
+    will never deliver batches larger than this number. Default: 100.
+    * `timeout`: How long the server can wait before delivering the events (ms).
+    Once this timeout is reached, a batch is delivered even if incomplete.
+    This indirectly controls the max latency of event delivery. Default: 500ms.
+
+
+  # Examples
+
+  Subscribe to two topics, and dispatch events within 2 seconds, in batches
+  no larger than 300 events:
+
+      Director.subscribe(
+        ~w(users orders),
+        "https://example.com/rm-events",
+        max: 300,
+        timeout: 2_000
+      )
   """
-  def subscribe(topics, callback, options) do
+  def subscribe(topics, callback, options \\ []) do
+    Enum.each(topics, &validate_name!/1)
+
     data = %{
       topics: topics,
       callback: callback,
+      uuid: Config.client_token,
       max: options[:max],
-      timeout: options[:timeout],
+      timeout: options[:timeout]
     }
 
-    post("/subscriptions", data)
+    case post("/subscriptions", data) do
+      %{status: 204} ->
+        {:ok, nil}
+      %{status: status} ->
+        {:error, status}
+    end
   end
 
   @doc """
