@@ -1,4 +1,4 @@
 defmodule Routemaster.Publisher do
-  use Tesla
+  use Tesla, docs: false
   adapter Tesla.Adapter.Hackney
 end
