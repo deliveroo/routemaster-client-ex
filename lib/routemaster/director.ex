@@ -74,7 +74,7 @@ defmodule Routemaster.Director do
     validate_name! name
     case delete("/topics/" <> name) do
       %{status: 204} ->
-        {:ok, nil}
+        :ok
       %{status: status} ->
         {:error, status}
     end
@@ -121,7 +121,7 @@ defmodule Routemaster.Director do
 
     case post("/subscription", data) do
       %{status: 204} ->
-        {:ok, nil}
+        :ok
       %{status: status} ->
         {:error, status}
     end

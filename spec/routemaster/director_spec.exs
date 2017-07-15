@@ -160,8 +160,8 @@ defmodule Routemaster.DirectorSpec do
       context "when deleting an existing owned topic" do
         let :status, do: 204
 
-        it "returns {:ok, nil}" do
-          expect subject() |> to(eq {:ok, nil})
+        it "returns :ok" do
+          expect subject() |> to(eq :ok)
         end
       end
 
@@ -199,7 +199,7 @@ defmodule Routemaster.DirectorSpec do
 
       before do
         response_status = status()
-        Bypass.expect_once shared.bypass, "POST", "/subscriptions" , fn conn ->
+        Bypass.expect_once shared.bypass, "POST", "/subscription" , fn conn ->
           {:ok, body, _} = Plug.Conn.read_body(conn)
           {:ok, data} = Poison.decode(body)
 
@@ -217,8 +217,8 @@ defmodule Routemaster.DirectorSpec do
       describe "with a successful response" do
         let :status, do: 204
 
-        it "returns {:ok, nil}" do
-          expect subject() |> to(eq {:ok, nil})
+        it "returns :ok" do
+          expect subject() |> to(eq :ok)
         end
       end
 
