@@ -61,4 +61,16 @@ defmodule Routemaster.Config do
   def drain_url do
     Application.get_env(@app, :drain_url)
   end
+
+
+  @hackney_defaults [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
+
+  @doc """
+  Options passed to the `Director`'s `hackney` adapter.  
+  See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
+  for more details.
+  """
+  def director_http_options do
+    Application.get_env(@app, :director_http_options, @hackney_defaults)
+  end
 end

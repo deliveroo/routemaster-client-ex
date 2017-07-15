@@ -74,4 +74,10 @@ defmodule Routemaster.ConfigSpec do
       expect Config.drain_url |> to(eql "http://drain-url.local/events")
     end
   end
+
+  specify "director_http_options() returns some options for hackney" do
+    [{:recv_timeout, rec_t}, {:connect_timeout, con_t}] = Config.director_http_options
+    expect rec_t |> to(be_integer())
+    expect con_t |> to(be_integer())
+  end
 end

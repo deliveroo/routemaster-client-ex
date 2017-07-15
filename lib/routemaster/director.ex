@@ -9,7 +9,7 @@ defmodule Routemaster.Director do
   import Routemaster.Topic, only: [validate_name!: 1]
   alias Routemaster.Config
 
-  adapter Tesla.Adapter.Hackney
+  adapter Tesla.Adapter.Hackney, Config.director_http_options
 
   # Make this the outermost middleare to calculate the timing
   # for the entire stack.
