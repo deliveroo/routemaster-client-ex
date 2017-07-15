@@ -231,4 +231,150 @@ defmodule Routemaster.DirectorSpec do
       end
     end
   end
+
+
+  describe "unsubscribe() unsubscribes from one topic" do
+    describe "with an invalid topic name" do
+      it "raises an exception" do
+        expect fn() -> Director.unsubscribe("foo bar") end
+        |> to(raise_exception Routemaster.Topic.InvalidNameError)
+      end
+    end
+
+    describe "with a valid topic name" do
+      let :topic_name, do: "ducks"
+      subject(Director.unsubscribe(topic_name()))
+
+      before do
+        response_status = status()
+        name = topic_name()
+        Bypass.expect_once shared.bypass, "DELETE", "/subscriber/topics/#{name}" , fn conn ->
+          Conn.resp(conn, response_status, "")
+        end
+      end
+
+      context "when deleting from a subscribed topoc" do
+        let :status, do: 204
+
+        it "returns :ok" do
+          expect subject() |> to(eq :ok)
+        end
+      end
+
+      context "when deleting a NON existing topic or a topic to which we're not subscribed" do
+        let :status, do: 404
+
+        it "returns {:error, 404}" do
+          expect subject() |> to(eq {:error, 404})
+        end
+      end
+    end
+  end
+
+
+  describe "unsubscribe_all() unsubscribes from all topics" do
+    subject(Director.unsubscribe_all())
+
+    before do
+      response_status = status()
+      Bypass.expect_once shared.bypass, "DELETE", "/subscriber" , fn conn ->
+        Conn.resp(conn, response_status, "")
+      end
+    end
+
+    context "with a successful response" do
+      let :status, do: 204
+
+      it "returns :ok" do
+        expect subject() |> to(eq :ok)
+      end
+    end
+
+    context "with an NON successful response" do
+      let :status, do: 400
+
+      it "returns {:error, 400}" do
+        expect subject() |> to(eq {:error, 400})
+      end
+    end
+  end
+
+
+  describe "all_subscribers() GETs a list of subscribers" do
+    subject(Director.all_subscribers())
+
+    before do
+      response_status = status()
+      response_body = raw_body()
+      Bypass.expect_once shared.bypass, "GET", "/subscribers", fn conn ->
+        conn
+        |> Conn.resp(response_status, response_body)
+        |> Conn.put_resp_content_type("application/json")
+      end
+    end
+
+    context "with a successful response" do
+      let :status, do: 200
+      let :raw_body do
+        compact_string ~s<
+          [
+            {
+              "subscriber" : "some-service--uuid",
+              "callback" : "https://some.service.test/events",
+              "topics" : ["boats", "trains"],
+              "events" : { "sent": null, "queued": 0, "oldest": null}
+            },
+            {
+              "subscriber" : "another-service--uuid",
+              "callback" : "https://another.service.test/events",
+              "topics" : ["trains"],
+              "events" : { "sent": null, "queued": 42, "oldest": null}
+            }
+          ]
+        >
+      end
+
+      let :parsed_body do
+        [
+          %{
+            "callback" => "https://some.service.test/events",
+            "events" => %{"oldest" => nil, "queued" => 0, "sent" => nil},
+            "subscriber" => "some-service--uuid",
+            "topics" => ["boats", "trains"]
+          },
+          %{
+            "callback" => "https://another.service.test/events",
+            "events" => %{"oldest" => nil, "queued" => 42, "sent" => nil},
+            "subscriber" => "another-service--uuid",
+            "topics" => ["trains"]
+          }
+        ]
+      end
+
+      it "returns a list of maps for a successful response" do
+        {:ok, subscribers} = subject()
+        expect subscribers |> to(eq parsed_body())
+      end
+    end
+
+    context "with a NON successful response" do
+      let :raw_body, do: ""
+
+      describe "HTTP 400" do
+        let :status, do: 400
+
+        it "returns an error with the HTTP status code" do
+          expect subject() |> to(eq {:error, 400})
+        end
+      end
+
+      describe "HTTP 500" do
+        let :status, do: 500
+
+        it "returns an error with the HTTP status code" do
+          expect subject() |> to(eq {:error, 500})
+        end
+      end
+    end
+  end
 end

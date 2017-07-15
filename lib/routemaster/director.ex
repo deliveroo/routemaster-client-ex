@@ -128,19 +128,44 @@ defmodule Routemaster.Director do
   end
 
   @doc """
+  Unsubscribes this consumer from the provided topic.
+  Returns `:ok` on success and `{:error, 404}` if either the topic
+  doesn't exist or we are not subscribed to it.
   """
-  def unsubscribe(topics) when is_list(topics) do
-    Enum.each topics, &unsubscribe/1
-  end
-
-  def unsubscribe(topic) do
-    delete("/subscriber/topics/" <> topic)
+  def unsubscribe(topic_name) do
+    validate_name! topic_name
+    case delete("/subscriber/topics/" <> topic_name) do
+      %{status: 204} ->
+        :ok
+      %{status: status} ->
+        {:error, status}
+    end
   end
 
 
   @doc """
+  Unsubscribes this consumer from all current topics.
   """
   def unsubscribe_all do
-    delete("/subscriber")
+    case delete("/subscriber") do
+      %{status: 204} ->
+        :ok
+      %{status: status} ->
+        {:error, status}
+    end
+  end
+
+
+  @doc """
+  Retrieves the subscribers currently known to the server
+  and their metadata.
+  """
+  def all_subscribers do
+    case get("/subscribers") do
+      %{status: 200, body: subscribers} ->
+        {:ok, subscribers}
+      %{status: status} ->
+        {:error, status}
+    end
   end
 end
