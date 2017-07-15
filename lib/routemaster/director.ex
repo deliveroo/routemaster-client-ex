@@ -6,6 +6,7 @@ defmodule Routemaster.Director do
   """
 
   use Tesla, docs: false
+  import Routemaster.Topic, only: [validate_name!: 1]
 
   adapter Tesla.Adapter.Hackney
 
@@ -55,6 +56,7 @@ defmodule Routemaster.Director do
   It will fetch all topics over the network and filter them locally.
   """
   def get_topic(name) do
+    validate_name! name
     case all_topics() do
       {:ok, topics} ->
         topic = Enum.find(topics, fn(t) -> t["name"] == name end)
@@ -67,8 +69,9 @@ defmodule Routemaster.Director do
   @doc """
   Deletes an owned topic from the bus server.
   """
-  def delete_topic(topic) do
-    case delete("/topics/" <> topic) do
+  def delete_topic(name) do
+    validate_name! name
+    case delete("/topics/" <> name) do
       %{status: 204} ->
         {:ok, nil}
       %{status: status} ->
