@@ -73,4 +73,8 @@ defmodule Routemaster.Config do
   def director_http_options do
     Application.get_env(@app, :director_http_options, @hackney_defaults)
   end
+
+  def publisher_http_options do
+    Application.get_env(@app, :publisher_http_options, @hackney_defaults)
+  end
 end

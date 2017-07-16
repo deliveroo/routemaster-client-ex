@@ -1,5 +1,6 @@
-alias Routemaster.Redis
 alias Routemaster.Config
+alias Routemaster.Utils
+alias Routemaster.Redis
 alias Routemaster.Cache
 alias Routemaster.Fetcher
 alias Routemaster.Publisher

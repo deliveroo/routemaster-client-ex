@@ -17,7 +17,7 @@ defmodule Routemaster.DirectorSpec do
 
   it "sets the correct user-agent HTTP header" do
     Bypass.expect_once shared.bypass, "GET", "/topics", fn conn ->
-      [ua|[]] = Plug.Conn.get_req_header conn, "user-agent"
+      [ua|[]] = Conn.get_req_header conn, "user-agent"
       expect ua |> to(start_with "routemaster-client-ex-v")
 
       conn

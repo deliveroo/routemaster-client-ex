@@ -20,6 +20,10 @@ defmodule Routemaster.TestUtils do
     Redix.command!(conn, ["DEL" | keys])
   end
 
+  # This copies the implementation of Routemaster.Utils.now/1.
+  # We want this to be independent and not delegate to the other
+  # one, otherwise mocking Utils.now/1 would lead to a loop.
+  #
   def now do
     DateTime.utc_now() |> DateTime.to_unix()
   end
@@ -33,5 +37,12 @@ defmodule Routemaster.TestUtils do
 
   def compact_string(str) do
     String.replace(str, ~r/\s+/, "")
+  end
+
+
+  def request_payload(conn) do
+    {:ok, body, _} = Plug.Conn.read_body(conn)
+    {:ok, data} = Poison.decode(body)
+    data
   end
 end
