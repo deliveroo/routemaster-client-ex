@@ -38,4 +38,11 @@ defmodule Routemaster.TestUtils do
   def compact_string(str) do
     String.replace(str, ~r/\s+/, "")
   end
+
+
+  def request_payload(conn) do
+    {:ok, body, _} = Plug.Conn.read_body(conn)
+    {:ok, data} = Poison.decode(body)
+    data
+  end
 end
