@@ -20,8 +20,12 @@ defmodule Routemaster.TestUtils do
     Redix.command!(conn, ["DEL" | keys])
   end
 
+  # This copies the implementation of Routemaster.Utils.now/1.
+  # We want this to be independent and not delegate to the other
+  # one, otherwise mocking Utils.now/1 would lead to a loop.
+  #
   def now do
-    Routemaster.Utils.now
+    DateTime.utc_now() |> DateTime.to_unix()
   end
 
   def make_drain_event(index) do

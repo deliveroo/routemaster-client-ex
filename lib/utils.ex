@@ -9,4 +9,12 @@ defmodule Routemaster.Utils do
   def now do
     DateTime.utc_now() |> DateTime.to_unix()
   end
+
+
+  def valid_url?(url) do
+    case URI.parse(url) do
+      %URI{scheme: "https"} -> true
+      _ -> false
+    end
+  end
 end

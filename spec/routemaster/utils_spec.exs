@@ -18,4 +18,21 @@ defmodule Routemaster.UtilsSpec do
       expect dt.utc_offset |> to(eq correct.utc_offset)
     end
   end
+
+
+  describe "valid_url?" do
+    it "returns true with a valid HTTPS URL" do
+      assert Utils.valid_url?("https://foo.bar")
+    end
+
+    it "returns false with a valid HTTP URL" do
+      refute Utils.valid_url?("http://foo.bar")
+    end
+
+    it "returns false with a non-HTTP(S) URL" do
+      refute Utils.valid_url?("ftp://foo.bar")
+      refute Utils.valid_url?("foo.bar")
+      refute Utils.valid_url?("")
+    end
+  end
 end
