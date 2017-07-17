@@ -17,8 +17,8 @@ config :routemaster, :redis_data,
 config :routemaster, :api_token,
   {:system, "ROUTEMASTER_API_TOKEN"}
 
-config :routemaster, :client_token,
-  {:system, "ROUTEMASTER_CLIENT_TOKEN"}
+config :routemaster, :drain_token,
+  {:system, "ROUTEMASTER_DRAIN_TOKEN"}
 
 config :routemaster, :bus_url,
   {:system, "ROUTEMASTER_URL"}

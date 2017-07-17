@@ -219,7 +219,7 @@ defmodule Routemaster.DirectorSpec do
 
           expect data["topics"]   |> to(eq ~w(ducks rabbits))
           expect data["callback"] |> to(eq "http://drain-url.local/events")
-          expect data["uuid"]     |> to(eq Config.client_token)
+          expect data["uuid"]     |> to(eq Config.drain_token)
           expect data["max"]      |> to(eq 42)
           expect data["timeout"]  |> to(eq 1_000)
 

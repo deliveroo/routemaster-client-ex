@@ -111,7 +111,7 @@ defmodule Routemaster.Director do
     data = %{
       topics: topics,
       callback: Config.drain_url,
-      uuid: Config.client_token,
+      uuid: Config.drain_token,
       max: options[:max],
       timeout: options[:timeout]
     }

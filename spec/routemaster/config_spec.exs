@@ -63,9 +63,9 @@ defmodule Routemaster.ConfigSpec do
     end
   end
 
-  describe "client_token" do
+  describe "drain_token" do
     it "returns a string" do
-      expect Config.client_token |> to(eql "a-test-client-token")
+      expect Config.drain_token |> to(eql "a-test-drain-token")
     end
   end
 
