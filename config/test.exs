@@ -21,3 +21,6 @@ config :routemaster, :drain_url, "http://drain-url.local/events"
 #
 # config :routemaster, :publisher_http_options,
 #   [{:recv_timeout, 300_000}, {:connect_timeout, 300_000}]
+#
+# config :routemaster, :fetcher_http_options,
+#   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]

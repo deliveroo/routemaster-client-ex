@@ -86,4 +86,10 @@ defmodule Routemaster.ConfigSpec do
     expect rec_t |> to(be_integer())
     expect con_t |> to(be_integer())
   end
+
+  specify "fetcher_http_options() returns some options for hackney" do
+    [{:recv_timeout, rec_t}, {:connect_timeout, con_t}] = Config.fetcher_http_options
+    expect rec_t |> to(be_integer())
+    expect con_t |> to(be_integer())
+  end
 end

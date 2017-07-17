@@ -1,4 +1,11 @@
 defmodule Routemaster.Fetcher do
+  @moduledoc """
+  API client to fetch resources linked to from the events.
+  """
+
   use Tesla, docs: false
-  adapter Tesla.Adapter.Hackney
+
+  alias Routemaster.Config
+
+  adapter Tesla.Adapter.Hackney, Config.fetcher_http_options
 end

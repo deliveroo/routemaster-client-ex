@@ -33,6 +33,9 @@ config :routemaster, :drain_url,
 #
 # config :routemaster, :publisher_http_options,
 #   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
+#
+# config :routemaster, :fetcher_http_options,
+#   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
 
 
 case Mix.env do
