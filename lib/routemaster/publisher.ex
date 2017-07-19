@@ -22,7 +22,7 @@ defmodule Routemaster.Publisher do
   plug Routemaster.Middleware.BaseUrl
   plug Routemaster.Middleware.BasicAuth
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
-  plug Tesla.Middleware.JSON
+  plug Tesla.Middleware.EncodeJson
   plug Tesla.Middleware.Headers, %{"user-agent" => Config.user_agent}
 
   # If enabled, this must be the innermost middleware in order
