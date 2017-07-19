@@ -2,6 +2,7 @@ defmodule Routemaster.Config do
   @moduledoc """
   Centralized access to the client configuration.
   """
+  require Logger
 
   @app :routemaster
 
@@ -88,13 +89,13 @@ defmodule Routemaster.Config do
   beforehand.
   """
   def service_auth_credentials do
-    case Application.get_env(@app, :service_auth_credentials_cached) do
-      nil ->
+    case Application.fetch_env(@app, :service_auth_credentials_cached) do
+      {:ok, current_value} ->
+        current_value
+      :error ->
         data = load_service_auth_credentials()
         Application.put_env(@app, :service_auth_credentials_cached, data, persistent: true)
         data
-      current_value ->
-        current_value
     end
   end
 
@@ -104,13 +105,18 @@ defmodule Routemaster.Config do
   # The values are properly split and stored in a lookup Map.
   #
   defp load_service_auth_credentials do
-    Application.get_env(@app, :service_auth_credentials)
-    |> String.split(",")
-    |> Enum.map(fn(str) ->
-      [host, user, token] = String.split(str, ":")
-      {host, [user: user, token: token]}
-    end)
-    |> Enum.into(%{})
+    Logger.debug "Routemaster: loading service auth credentials"
+    try do
+      Application.get_env(@app, :service_auth_credentials)
+      |> String.split(",")
+      |> Enum.map(fn(str) ->
+        [host, user, token] = String.split(str, ":")
+        {host, [user: user, token: token]}
+      end)
+      |> Enum.into(%{})
+    rescue _e ->
+      raise "Routemaster: Invalid configuration for :service_auth_credentials"
+    end
   end
 
 
