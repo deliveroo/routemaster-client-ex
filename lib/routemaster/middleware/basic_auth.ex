@@ -19,6 +19,7 @@ defmodule Routemaster.Middleware.BasicAuth do
   """
 
   alias Routemaster.Config
+  alias Routemaster.Utils
 
   def call(env, next, _opts) do
     env
@@ -26,9 +27,11 @@ defmodule Routemaster.Middleware.BasicAuth do
     |> Tesla.run(next)
   end
 
+  # Add a HTTP Basic auth header with the API token to talk
+  # with the event bus server.
+  #
   defp auth_header do
-    token = Base.encode64(Config.api_token <> ":x")
-    %{"Authorization" => "Basic #{token}"}
+    Utils.build_auth_header(Config.api_token(), "x")
   end
 end
 

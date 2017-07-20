@@ -35,4 +35,19 @@ defmodule Routemaster.UtilsSpec do
       refute Utils.valid_url?("")
     end
   end
+
+  describe "build_auth_header(username, password)" do
+    let :username, do: "I know this!"
+    let :password, do: "It's a Unix system!"
+
+    before do
+      token = Base.encode64("#{username()}:#{password()}")
+      {:shared, token: token}
+    end
+
+    it "returns a Authentication HTTP header Map" do
+      expect Utils.build_auth_header(username(), password())
+      |> to(eq %{"Authorization" => "Basic #{shared.token}"})
+    end
+  end
 end
