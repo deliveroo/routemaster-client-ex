@@ -2,6 +2,7 @@ defmodule Routemaster.Config do
   @moduledoc """
   Centralized access to the client configuration.
   """
+  require Logger
 
   @app :routemaster
 
@@ -76,5 +77,57 @@ defmodule Routemaster.Config do
 
   def publisher_http_options do
     Application.get_env(@app, :publisher_http_options, @hackney_defaults)
+  end
+
+  def fetcher_http_options do
+    Application.get_env(@app, :fetcher_http_options, @hackney_defaults)
+  end
+
+  @doc """
+  Returns the authentication credentials for other services with which
+  we might want to interact. The credentials need to be configured
+  beforehand.
+  """
+  def service_auth_credentials do
+    case Application.fetch_env(@app, :service_auth_credentials_cached) do
+      {:ok, current_value} ->
+        current_value
+      :error ->
+        data = load_service_auth_credentials()
+        Application.put_env(@app, :service_auth_credentials_cached, data, persistent: true)
+        data
+    end
+  end
+
+
+  # Load the raw configuration value, which is a comma-separated
+  # string of auth tokens in the form: "hostname:username:authtoken".
+  # The values are properly split and stored in a lookup Map.
+  #
+  defp load_service_auth_credentials do
+    Logger.debug "Routemaster: loading service auth credentials"
+    try do
+      Application.get_env(@app, :service_auth_credentials)
+      |> String.split(",")
+      |> Enum.map(fn(str) ->
+        [host, user, token] = String.split(str, ":")
+        {host, [user: user, token: token]}
+      end)
+      |> Enum.into(%{})
+    rescue _e ->
+      raise "Routemaster: Invalid configuration for :service_auth_credentials"
+    end
+  end
+
+
+  @doc """
+  Returns the username and token for a given hostname. The hostname
+  must be found in the credentials returned by `service_auth_credentials/0`
+  """
+  def service_auth_for(host) do
+    case service_auth_credentials()[host] do
+      nil -> :error
+      data -> {:ok, data} 
+    end
   end
 end

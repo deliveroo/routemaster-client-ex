@@ -26,12 +26,18 @@ config :routemaster, :bus_url,
 config :routemaster, :drain_url,
   {:system, "ROUTEMASTER_DRAIN_URL"}
 
+config :routemaster, :service_auth_credentials,
+  {:system, "ROUTEMASTER_SERVICE_AUTH_CREDENTIALS"}
+
 # These match the hackney defaults and are here just as an example.
 #
 # config :routemaster, :director_http_options,
 #   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
 #
 # config :routemaster, :publisher_http_options,
+#   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
+#
+# config :routemaster, :fetcher_http_options,
 #   [{:recv_timeout, 5_000}, {:connect_timeout, 8_000}]
 
 

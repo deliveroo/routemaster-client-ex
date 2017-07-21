@@ -86,4 +86,63 @@ defmodule Routemaster.ConfigSpec do
     expect rec_t |> to(be_integer())
     expect con_t |> to(be_integer())
   end
+
+  specify "fetcher_http_options() returns some options for hackney" do
+    [{:recv_timeout, rec_t}, {:connect_timeout, con_t}] = Config.fetcher_http_options
+    expect rec_t |> to(be_integer())
+    expect con_t |> to(be_integer())
+  end
+
+
+  describe "service_auth_credentials" do
+    subject(Config.service_auth_credentials())
+
+    it "returns a Map" do
+      expect subject() |> to(be_map())
+    end
+
+    describe "in the Map" do
+      specify "keys are strings" do
+        keys = Map.keys(subject())
+
+        Enum.each keys, fn(key) ->
+          expect key |> to(be_binary())
+        end
+      end
+
+      specify "and values are keyword lists with :user and :token keys" do
+        values = Map.values(subject())
+
+        Enum.each values, fn(value) ->
+          expect value         |> to(be_list())
+          expect value[:user]  |> to(be_binary())
+          expect value[:token] |> to(be_binary())
+        end
+      end
+    end
+
+    it "can be used to check auth credentials for services" do
+      expect subject() |> to(
+        eq %{
+          "localhost" => [user: "a-user", token: "a-token"],
+          "foobar.local" => [user: "name", token: "secret"]
+        }
+      )
+    end
+  end
+
+
+  describe "service_auth_for(hostname)" do
+    it "returns {:ok, [stored auth credentials]} for a known hostname" do
+      expect Config.service_auth_for("localhost")
+      |> to(eq {:ok, [user: "a-user", token: "a-token"]})
+
+      expect Config.service_auth_for("foobar.local")
+      |> to(eq {:ok, [user: "name", token: "secret"]})
+    end
+
+    it "returns :error for unknown hostnames" do
+      expect Config.service_auth_for("unknown.host.com") |> to(eq :error)
+    end
+  end
 end
