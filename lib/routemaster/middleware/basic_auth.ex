@@ -19,7 +19,6 @@ defmodule Routemaster.Middleware.BasicAuth do
   """
 
   alias Routemaster.Config
-  alias Routemaster.Utils
 
   def call(env, next, _opts) do
     env
@@ -31,7 +30,7 @@ defmodule Routemaster.Middleware.BasicAuth do
   # with the event bus server.
   #
   defp auth_header do
-    %{"Authorization" => Utils.build_auth_header(Config.api_token(), "x")}
+    %{"Authorization" => Config.api_auth_header()}
   end
 end
 

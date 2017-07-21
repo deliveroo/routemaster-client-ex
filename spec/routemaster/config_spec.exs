@@ -63,6 +63,12 @@ defmodule Routemaster.ConfigSpec do
     end
   end
 
+  describe "api_auth_header" do
+    it "returns a basic auth header value" do
+      expect Config.api_auth_header |> to(eql "Basic YS10ZXN0LWFwaS10b2tlbjp4")
+    end
+  end
+
   describe "drain_token" do
     it "returns a string" do
       expect Config.drain_token |> to(eql "a-test-drain-token")

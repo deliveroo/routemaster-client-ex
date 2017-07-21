@@ -56,6 +56,18 @@ defmodule Routemaster.Config do
     Application.get_env(@app, :api_token)
   end
 
+  def api_auth_header do
+    case Application.fetch_env(@app, :api_auth_header) do
+      {:ok, value} ->
+        value
+      :error ->
+        Logger.debug "Routemaster: loading bus server auth credentials"
+        data = Utils.build_auth_header(api_token(), "x")
+        Application.put_env(@app, :api_auth_header, data, persistent: true)
+        data
+    end
+  end
+
   def drain_token do
     Application.get_env(@app, :drain_token)
   end
