@@ -7,7 +7,6 @@ defmodule Routemaster.Fetcher do
   use Tesla, docs: false, only: []
 
   alias Routemaster.Config
-  alias Routemaster.Utils
 
   adapter Tesla.Adapter.Hackney, Config.fetcher_http_options
 
@@ -63,7 +62,7 @@ defmodule Routemaster.Fetcher do
     auth_header = 
       case Config.service_auth_for(host) do
         {:ok, auth} ->
-          Utils.build_auth_header(auth[:user], auth[:token])
+          %{"Authorization" => auth}
         :error ->
           raise "Unknown credentials for #{host}"
       end

@@ -31,7 +31,7 @@ defmodule Routemaster.Middleware.BasicAuth do
   # with the event bus server.
   #
   defp auth_header do
-    Utils.build_auth_header(Config.api_token(), "x")
+    %{"Authorization" => Utils.build_auth_header(Config.api_token(), "x")}
   end
 end
 

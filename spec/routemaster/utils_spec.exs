@@ -45,9 +45,9 @@ defmodule Routemaster.UtilsSpec do
       {:shared, token: token}
     end
 
-    it "returns a Authentication HTTP header Map" do
+    it "returns a Authentication HTTP header value" do
       expect Utils.build_auth_header(username(), password())
-      |> to(eq %{"Authorization" => "Basic #{shared.token}"})
+      |> to(eq "Basic #{shared.token}")
     end
   end
 end

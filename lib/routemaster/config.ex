@@ -3,6 +3,7 @@ defmodule Routemaster.Config do
   Centralized access to the client configuration.
   """
   require Logger
+  alias Routemaster.Utils
 
   @app :routemaster
 
@@ -111,7 +112,7 @@ defmodule Routemaster.Config do
       |> String.split(",")
       |> Enum.map(fn(str) ->
         [host, user, token] = String.split(str, ":")
-        {host, [user: user, token: token]}
+        {host, Utils.build_auth_header(user, token)}
       end)
       |> Enum.into(%{})
     rescue _e ->
@@ -127,7 +128,7 @@ defmodule Routemaster.Config do
   def service_auth_for(host) do
     case service_auth_credentials()[host] do
       nil -> :error
-      data -> {:ok, data} 
+      auth -> {:ok, auth} 
     end
   end
 end
