@@ -6,8 +6,22 @@ This Elixir package is a client for the [Routemaster](https://github.com/deliver
 
 The project is a work in progress and it aims to port the functionality of the Ruby clients, [routemaster-drain](https://github.com/deliveroo/routemaster-drain) and [routemaster-client](https://github.com/deliveroo/routemaster-client).
 
+## Content
 
-## Project organization
+* [Project Organization](#project-organization)
+* [Development Setup](#development-setup)
+    - [Install an Elixir Environment](#install-an-elixir-environment)
+    - [Install Redis](#install-redis)
+    - [Setup the Project](#setup-the-project)
+* [Configure](#configure)
+* [Run](#run)
+    - [Start Redis](#start-redis)
+    - [Terminal Commands](#terminal-commands)
+* [Test](#test)
+
+
+
+## Project Organization
 
 The package is organized in four main functional areas:
 
@@ -20,7 +34,7 @@ The initial milestone is to implement an event receiver close in functionality t
 
 ## Development Setup
 
-### Install an Elixir environment
+### Install an Elixir Environment
 
 The project targets the latest stable Elixir `1.4.x` release.
 
@@ -56,7 +70,7 @@ $ brew update
 $ brew install redis
 ```
 
-### Setup the project
+### Setup the Project
 
 Clone the repo, then install the dependencies:
 
@@ -98,7 +112,7 @@ Redis is a runtime requirement. In the development and test environment the clie
 $ redis-server
 ```
 
-### Terminal commands
+### Terminal Commands
 
 To start a REPL console:
 
