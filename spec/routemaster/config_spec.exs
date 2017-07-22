@@ -63,6 +63,12 @@ defmodule Routemaster.ConfigSpec do
     end
   end
 
+  describe "api_auth_header" do
+    it "returns a basic auth header value" do
+      expect Config.api_auth_header |> to(eql "Basic YS10ZXN0LWFwaS10b2tlbjp4")
+    end
+  end
+
   describe "drain_token" do
     it "returns a string" do
       expect Config.drain_token |> to(eql "a-test-drain-token")
@@ -110,13 +116,13 @@ defmodule Routemaster.ConfigSpec do
         end
       end
 
-      specify "and values are keyword lists with :user and :token keys" do
+
+      specify "and values are strings starting with Basic" do
         values = Map.values(subject())
 
         Enum.each values, fn(value) ->
-          expect value         |> to(be_list())
-          expect value[:user]  |> to(be_binary())
-          expect value[:token] |> to(be_binary())
+          expect value |> to(be_binary())
+          expect value |> to(start_with "Basic ")
         end
       end
     end
@@ -124,8 +130,8 @@ defmodule Routemaster.ConfigSpec do
     it "can be used to check auth credentials for services" do
       expect subject() |> to(
         eq %{
-          "localhost" => [user: "a-user", token: "a-token"],
-          "foobar.local" => [user: "name", token: "secret"]
+          "localhost" => "Basic YS11c2VyOmEtdG9rZW4=",
+          "foobar.local" => "Basic bmFtZTpzZWNyZXQ="
         }
       )
     end
@@ -135,10 +141,10 @@ defmodule Routemaster.ConfigSpec do
   describe "service_auth_for(hostname)" do
     it "returns {:ok, [stored auth credentials]} for a known hostname" do
       expect Config.service_auth_for("localhost")
-      |> to(eq {:ok, [user: "a-user", token: "a-token"]})
+      |> to(eq {:ok, "Basic YS11c2VyOmEtdG9rZW4="})
 
       expect Config.service_auth_for("foobar.local")
-      |> to(eq {:ok, [user: "name", token: "secret"]})
+      |> to(eq {:ok, "Basic bmFtZTpzZWNyZXQ="})
     end
 
     it "returns :error for unknown hostnames" do

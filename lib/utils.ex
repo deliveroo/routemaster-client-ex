@@ -23,11 +23,11 @@ defmodule Routemaster.Utils do
 
 
   @doc """
-  Returns a HTTP Authorization header Map from
+  Returns a HTTP Authorization header value from
   the provided plaintext username and password.
   """
   def build_auth_header(username, password) do
     token = Base.encode64(username <> ":" <> password)
-    %{"Authorization" => "Basic #{token}"}
+    "Basic #{token}"
   end
 end

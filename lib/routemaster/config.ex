@@ -3,6 +3,7 @@ defmodule Routemaster.Config do
   Centralized access to the client configuration.
   """
   require Logger
+  alias Routemaster.Utils
 
   @app :routemaster
 
@@ -47,18 +48,61 @@ defmodule Routemaster.Config do
   end
 
 
+  @doc """
+  The HTTPS URL of the Routemaster event bus server.
+  """
   def bus_url do
     Application.get_env(@app, :bus_url)
   end
 
+
+  @doc """
+  The API token to authenticate requests to the event bus server.
+  """
   def api_token do
     Application.get_env(@app, :api_token)
   end
 
+
+  @doc """
+  The HTTP Basic Authorization Header value to authenticate
+  requests to the event bus server. It's derived from
+  a base64-encoded `Config.api_token`.
+  """
+  def api_auth_header do
+    case Application.fetch_env(@app, :api_auth_header) do
+      {:ok, value} ->
+        value
+      :error ->
+        Logger.debug "Routemaster: loading bus server auth credentials"
+        data = Utils.build_auth_header(api_token(), "x")
+        Application.put_env(@app, :api_auth_header, data, persistent: true)
+        data
+    end
+  end
+
+
+  @doc """
+  The auth token used by the Drain to authenticate incoming HTTP requests. This
+  token is specific to this application (an event consumer, AKA subscriber).
+
+  This token is sent to the event bus server when subscribing to topics, where
+  it will be stored with this subscriber's metadata. Later, when delivering
+  events, the server will send it back in the HTTP Authorization header of the
+  POST requests to this drain.
+  """
   def drain_token do
     Application.get_env(@app, :drain_token)
   end
 
+
+  @doc """
+  The HTTPS URL where this application will mount the Drain app. This is usually
+  a path, and that is where the event bus server will send HTTP POST requests to
+  deliver events.
+
+  This URL is sent to the event bus server when subscribing to topics.
+  """
   def drain_url do
     Application.get_env(@app, :drain_url)
   end
@@ -75,10 +119,20 @@ defmodule Routemaster.Config do
     Application.get_env(@app, :director_http_options, @hackney_defaults)
   end
 
+  @doc """
+  Options passed to the `Publisher`'s `hackney` adapter.  
+  See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
+  for more details.
+  """
   def publisher_http_options do
     Application.get_env(@app, :publisher_http_options, @hackney_defaults)
   end
 
+  @doc """
+  Options passed to the `Fetcher`'s `hackney` adapter.  
+  See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
+  for more details.
+  """
   def fetcher_http_options do
     Application.get_env(@app, :fetcher_http_options, @hackney_defaults)
   end
@@ -111,7 +165,7 @@ defmodule Routemaster.Config do
       |> String.split(",")
       |> Enum.map(fn(str) ->
         [host, user, token] = String.split(str, ":")
-        {host, [user: user, token: token]}
+        {host, Utils.build_auth_header(user, token)}
       end)
       |> Enum.into(%{})
     rescue _e ->
@@ -127,7 +181,7 @@ defmodule Routemaster.Config do
   def service_auth_for(host) do
     case service_auth_credentials()[host] do
       nil -> :error
-      data -> {:ok, data} 
+      auth -> {:ok, auth} 
     end
   end
 end
