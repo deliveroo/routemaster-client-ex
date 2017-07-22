@@ -178,15 +178,18 @@ defmodule Routemaster.Config do
   defp load_service_auth_credentials do
     Logger.debug "Routemaster: loading service auth credentials"
     try do
-      Application.get_env(@app, :service_auth_credentials)
+      @app
+      |> Application.get_env(:service_auth_credentials)
       |> String.split(",")
       |> Enum.map(fn(str) ->
         [host, user, token] = String.split(str, ":")
         {host, Utils.build_auth_header(user, token)}
       end)
       |> Enum.into(%{})
-    rescue _e ->
-      raise "Routemaster: Invalid configuration for :service_auth_credentials"
+    rescue e ->
+      trace = System.stacktrace
+      Logger.error "Routemaster: Invalid configuration for :service_auth_credentials"
+      reraise e, trace
     end
   end
 
@@ -200,7 +203,7 @@ defmodule Routemaster.Config do
   def service_auth_for(host) do
     case service_auth_credentials()[host] do
       nil -> :error
-      auth -> {:ok, auth} 
+      auth -> {:ok, auth}
     end
   end
 end
