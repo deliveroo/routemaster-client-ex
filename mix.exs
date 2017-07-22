@@ -15,7 +15,7 @@ defmodule Routemaster.Mixfile do
       deps: deps(),
       preferred_cli_env: [espec: :test],
       elixirc_paths: elixirc_paths(Mix.env),
-      dialyzer: [flags: [:unmatched_returns, :error_handling, :race_conditions, :underspecs]],
+      dialyzer: [flags: [:error_handling, :race_conditions]],
     ]
   end
 

@@ -7,7 +7,7 @@ defmodule Routemaster.Cache do
   @type fallback :: (() -> any)
 
   # todo: make this configurable or dynamic
-  @ttl 3600 # seconds
+  @ttl to_string(3600) # seconds
   @redis Routemaster.Redis.cache()
 
   @doc """

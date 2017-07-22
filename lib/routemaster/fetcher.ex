@@ -36,7 +36,7 @@ defmodule Routemaster.Fetcher do
   and it will raise an exception if no auth credentials can be found for
   a given URL.
   """
-  @spec get(binary) :: :ok | {:error, http_status}
+  @spec get(binary) :: {:ok, any} | {:error, http_status}
   def get(url) do
     case request(method: :get, url: url) do
       %{status: 200, body: body, headers: _headers} ->

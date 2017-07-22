@@ -28,7 +28,7 @@ defmodule Routemaster.Redis do
       iex> Routemaster.Redis.data.get(:foo)
       {:ok, "bar"}
   """
-  @spec data :: module
+  @spec data :: __MODULE__.Data
   def data, do: __MODULE__.Data
 
 
@@ -41,7 +41,7 @@ defmodule Routemaster.Redis do
       iex> Routemaster.Redis.cache.get(:foo)
       {:ok, "bar"}
   """
-  @spec cache :: module
+  @spec cache :: __MODULE__.Cache
   def cache, do: __MODULE__.Cache
 
 
