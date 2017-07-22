@@ -13,6 +13,7 @@ The project is a work in progress and it aims to port the functionality of the R
     - [Install an Elixir Environment](#install-an-elixir-environment)
     - [Install Redis](#install-redis)
     - [Setup the Project](#setup-the-project)
+    - [Development Tools](#development-tools)
 * [Configure](#configure)
 * [Run](#run)
     - [Start Redis](#start-redis)
@@ -87,6 +88,13 @@ $ mix deps.compile
 ```
 
 Mix installs dependencies in the project directory, in `./deps/`. This is very similar to what `npm` does. The compiled Elixir bytecode lives in `./_build/`.
+
+### Development Tools
+
+This project is setup with two development tools:
+
+* [Dialyzer](http://erlang.org/doc/man/dialyzer.html) (via [Dialyxir](https://github.com/jeremyjh/dialyxir)) is a static source code and bytecode analysis tool for the Erlang VM. It can be run with `mix dialyzer`. (The first time it will take some time to compile all the stdlib and create its lookup files in `~/.mix`. Successive runs will be fast.)
+* [Credo](https://github.com/rrrene/credo) is a static source code analysis tool for Elixir. It's very similar to Ruby's Rubocop. It can be run with `mix credo`.
 
 ## Configure
 
