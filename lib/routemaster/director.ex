@@ -5,6 +5,8 @@ defmodule Routemaster.Director do
   authenticated HTTP request to the even bus server.
   """
 
+  @type http_status :: non_neg_integer
+
   use Tesla, docs: false
   import Routemaster.Topic, only: [validate_name!: 1]
   alias Routemaster.Config
@@ -43,6 +45,7 @@ defmodule Routemaster.Director do
           "Couldn't get topics, HTTP error #{status}"
       end
   """
+  @spec all_topics :: {:ok, list(map)} | {:error, http_status}
   def all_topics do
     case get("/topics") do
       %{status: 200, body: topics} ->
@@ -57,6 +60,7 @@ defmodule Routemaster.Director do
   Returns a single topic, by name.
   It will fetch all topics over the network and filter them locally.
   """
+  @spec get_topic(binary) :: {:ok, map} | {:error, http_status}
   def get_topic(name) do
     validate_name! name
     case all_topics() do
@@ -71,6 +75,7 @@ defmodule Routemaster.Director do
   @doc """
   Deletes an owned topic from the bus server.
   """
+  @spec delete_topic(binary) :: :ok | {:error, http_status}
   def delete_topic(name) do
     validate_name! name
     case delete("/topics/" <> name) do
@@ -89,7 +94,7 @@ defmodule Routemaster.Director do
   * `topics`: a list of valid topic names. This must always be the complete
   set of topics this subscriber wants to receive, because any missing
   previously-submitted topics will see their subscriptions deleted.
-  * options (optional):
+  * options, an optional keyword list with:
     * `max`: How many events can be batched together on delivery. The server
     will never deliver batches larger than this number. Default: 100.
     * `timeout`: How long the server can wait before delivering the events (ms).
@@ -105,6 +110,7 @@ defmodule Routemaster.Director do
       Director.subscribe(~w(users orders), max: 300, timeout: 2_000)
 
   """
+  @spec subscribe(list(binary), Keyword.t) :: :ok | {:error, http_status}
   def subscribe(topics, options \\ []) do
     Enum.each(topics, &validate_name!/1)
 
@@ -129,6 +135,7 @@ defmodule Routemaster.Director do
   Returns `:ok` on success and `{:error, 404}` if either the topic
   doesn't exist or we are not subscribed to it.
   """
+  @spec unsubscribe(binary) :: :ok | {:error, http_status}
   def unsubscribe(topic_name) do
     validate_name! topic_name
     case delete("/subscriber/topics/" <> topic_name) do
@@ -143,6 +150,7 @@ defmodule Routemaster.Director do
   @doc """
   Unsubscribes this consumer from all current topics.
   """
+  @spec unsubscribe_all :: :ok | {:error, http_status}
   def unsubscribe_all do
     case delete("/subscriber") do
       %{status: 204} ->
@@ -157,6 +165,7 @@ defmodule Routemaster.Director do
   Retrieves the subscribers currently known to the server
   and their metadata.
   """
+  @spec all_subscribers :: {:ok, list(map)} | {:error, http_status}
   def all_subscribers do
     case get("/subscribers") do
       %{status: 200, body: subscribers} ->

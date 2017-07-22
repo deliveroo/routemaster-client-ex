@@ -4,6 +4,8 @@ defmodule Routemaster.Cache do
   backed by Redis.
   """
 
+  @type fallback :: (() -> any)
+
   # todo: make this configurable or dynamic
   @ttl 3600 # seconds
   @redis Routemaster.Redis.cache()
@@ -18,6 +20,7 @@ defmodule Routemaster.Cache do
       iex> Routemaster.Cache.read(:apple)
       {:ok, %{is: "a", good: "fruit"}}
   """
+  @spec read(atom | binary) :: {:ok, any} | {:miss, nil} | {:error, any}
   def read(key) do
     case @redis.get(key) do
       {:ok, nil} ->
@@ -37,6 +40,7 @@ defmodule Routemaster.Cache do
       iex> Routemaster.Cache.read(:pear)
       {:ok, [1, 2, 3]}
   """
+  @spec write(atom | binary, any) :: {:ok, any} | {:error, any}
   def write(key, term) do
     case @redis.setex(key, @ttl, serialize(term)) do
       {:ok, "OK"} ->
@@ -61,6 +65,7 @@ defmodule Routemaster.Cache do
       iex> Routemaster.Cache.read(:peach)
       {:ok, "apricot"}
   """
+  @spec fetch(atom | binary, fallback) :: {:ok, any} | {:error, any}
   def fetch(key, fallback) do
     case read(key) do
       {:miss, _} ->
@@ -83,6 +88,7 @@ defmodule Routemaster.Cache do
       {:miss, nil}
 
   """
+  @spec clear(atom | binary) :: :ok | :error
   def clear(key) do
     case @redis.del(key) do
       {:ok, _n} -> :ok # n is 0 or 1

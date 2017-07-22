@@ -18,6 +18,7 @@ defmodule Routemaster.Redis do
     worker(Redix, [Config.redis_config(type), [name: name, sync_connect: false]], [restart: :permanent, id: name])
   end
 
+
   @doc """
   Returns a redis connection to the persistent Redis store. The returned
   term can be used to issue Redis commands.
@@ -27,7 +28,9 @@ defmodule Routemaster.Redis do
       iex> Routemaster.Redis.data.get(:foo)
       {:ok, "bar"}
   """
+  @spec data :: module
   def data, do: __MODULE__.Data
+
 
   @doc """
   Returns a redis connection to the cache Redis store. The returned
@@ -38,7 +41,9 @@ defmodule Routemaster.Redis do
       iex> Routemaster.Redis.cache.get(:foo)
       {:ok, "bar"}
   """
+  @spec cache :: module
   def cache, do: __MODULE__.Cache
+
 
   defmacro __using__(type) do
     quote do

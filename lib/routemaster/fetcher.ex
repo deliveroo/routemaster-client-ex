@@ -3,6 +3,8 @@ defmodule Routemaster.Fetcher do
   API client to fetch resources linked to from the events.
   """
 
+  @type http_status :: non_neg_integer
+
   # Do not import any HTTP-verb function
   use Tesla, docs: false, only: []
 
@@ -34,6 +36,7 @@ defmodule Routemaster.Fetcher do
   and it will raise an exception if no auth credentials can be found for
   a given URL.
   """
+  @spec get(binary) :: :ok | {:error, http_status}
   def get(url) do
     case request(method: :get, url: url) do
       %{status: 200, body: body, headers: _headers} ->
@@ -49,6 +52,7 @@ defmodule Routemaster.Fetcher do
   host. It raises an exception if there are no credentials configured
   for a host.
   """
+  @spec authenticate!(Tesla.Env.t, list) :: Tesla.Env.t
   def authenticate!(env, next) do
     env
     |> do_authenticate!

@@ -19,6 +19,7 @@ defmodule Routemaster.Config do
   The user-agent HTTP header used when talking with the bus server
   and when fetching entities from their URLs.
   """
+  @spec user_agent :: binary
   def user_agent, do: @user_agent
 
 
@@ -27,6 +28,7 @@ defmodule Routemaster.Config do
   It could be either a Keyword List of parameters or a
   binary URI.
   """
+  @spec redis_config(atom) :: binary | Keyword.t
   def redis_config(type)
 
   def redis_config(:cache) do
@@ -51,6 +53,7 @@ defmodule Routemaster.Config do
   @doc """
   The HTTPS URL of the Routemaster event bus server.
   """
+  @spec bus_url :: binary
   def bus_url do
     Application.get_env(@app, :bus_url)
   end
@@ -59,6 +62,7 @@ defmodule Routemaster.Config do
   @doc """
   The API token to authenticate requests to the event bus server.
   """
+  @spec api_token :: binary
   def api_token do
     Application.get_env(@app, :api_token)
   end
@@ -69,6 +73,7 @@ defmodule Routemaster.Config do
   requests to the event bus server. It's derived from
   a base64-encoded `Config.api_token`.
   """
+  @spec api_auth_header :: binary
   def api_auth_header do
     case Application.fetch_env(@app, :api_auth_header) do
       {:ok, value} ->
@@ -91,6 +96,7 @@ defmodule Routemaster.Config do
   events, the server will send it back in the HTTP Authorization header of the
   POST requests to this drain.
   """
+  @spec drain_token :: binary
   def drain_token do
     Application.get_env(@app, :drain_token)
   end
@@ -103,6 +109,7 @@ defmodule Routemaster.Config do
 
   This URL is sent to the event bus server when subscribing to topics.
   """
+  @spec drain_url :: binary
   def drain_url do
     Application.get_env(@app, :drain_url)
   end
@@ -115,6 +122,7 @@ defmodule Routemaster.Config do
   See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
   for more details.
   """
+  @spec director_http_options :: Keyword.t
   def director_http_options do
     Application.get_env(@app, :director_http_options, @hackney_defaults)
   end
@@ -124,6 +132,7 @@ defmodule Routemaster.Config do
   See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
   for more details.
   """
+  @spec publisher_http_options :: Keyword.t
   def publisher_http_options do
     Application.get_env(@app, :publisher_http_options, @hackney_defaults)
   end
@@ -133,15 +142,23 @@ defmodule Routemaster.Config do
   See [the hackney docs](https://github.com/benoitc/hackney/blob/master/doc/hackney.md)
   for more details.
   """
+  @spec fetcher_http_options :: Keyword.t
   def fetcher_http_options do
     Application.get_env(@app, :fetcher_http_options, @hackney_defaults)
   end
 
   @doc """
-  Returns the authentication credentials for other services with which
-  we might want to interact. The credentials need to be configured
-  beforehand.
+  Authentication credentials for other services with which we're going to
+  interact. These are usually the origins or sources of the entities linked
+  to in the events.
+
+  It returns a Map where the keys are the hostnames of the other services
+  (binaries) and the values are the pre-built values for the HTTP Authorization
+  header.
+
+  The credentials need to be configured beforehand.
   """
+  @spec service_auth_credentials :: %{optional(binary) => binary}
   def service_auth_credentials do
     case Application.fetch_env(@app, :service_auth_credentials_cached) do
       {:ok, current_value} ->
@@ -175,9 +192,11 @@ defmodule Routemaster.Config do
 
 
   @doc """
-  Returns the username and token for a given hostname. The hostname
-  must be found in the credentials returned by `service_auth_credentials/0`
+  For the given hostname, it returns a HTTP Authorization header value.
+  The hostname must be found in the credentials Map returned by
+  `service_auth_credentials/0`
   """
+  @spec service_auth_for(binary) :: {:ok, binary} | :error
   def service_auth_for(host) do
     case service_auth_credentials()[host] do
       nil -> :error
