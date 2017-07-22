@@ -15,6 +15,7 @@ defmodule Routemaster.Mixfile do
       deps: deps(),
       preferred_cli_env: [espec: :test],
       elixirc_paths: elixirc_paths(Mix.env),
+      dialyzer: [flags: [:error_handling, :race_conditions]],
     ]
   end
 
@@ -46,9 +47,12 @@ defmodule Routemaster.Mixfile do
       {:hackney, "~> 1.8"},
       {:deferred_config, "~> 0.1.1"},
 
+      {:ex_doc, "~> 0.16", only: :dev},
+      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+
       {:espec, "~> 1.4", only: :test},
       {:bypass, "~> 0.8.0", only: :test},
-      {:ex_doc, "~> 0.16.1", only: :dev},
     ]
   end
 

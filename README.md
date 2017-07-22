@@ -6,8 +6,23 @@ This Elixir package is a client for the [Routemaster](https://github.com/deliver
 
 The project is a work in progress and it aims to port the functionality of the Ruby clients, [routemaster-drain](https://github.com/deliveroo/routemaster-drain) and [routemaster-client](https://github.com/deliveroo/routemaster-client).
 
+## Content
 
-## Project organization
+* [Project Organization](#project-organization)
+* [Development Setup](#development-setup)
+    - [Install an Elixir Environment](#install-an-elixir-environment)
+    - [Install Redis](#install-redis)
+    - [Setup the Project](#setup-the-project)
+    - [Development Tools](#development-tools)
+* [Configure](#configure)
+* [Run](#run)
+    - [Start Redis](#start-redis)
+    - [Terminal Commands](#terminal-commands)
+* [Test](#test)
+
+
+
+## Project Organization
 
 The package is organized in four main functional areas:
 
@@ -20,7 +35,7 @@ The initial milestone is to implement an event receiver close in functionality t
 
 ## Development Setup
 
-### Install an Elixir environment
+### Install an Elixir Environment
 
 The project targets the latest stable Elixir `1.4.x` release.
 
@@ -56,7 +71,7 @@ $ brew update
 $ brew install redis
 ```
 
-### Setup the project
+### Setup the Project
 
 Clone the repo, then install the dependencies:
 
@@ -73,6 +88,13 @@ $ mix deps.compile
 ```
 
 Mix installs dependencies in the project directory, in `./deps/`. This is very similar to what `npm` does. The compiled Elixir bytecode lives in `./_build/`.
+
+### Development Tools
+
+This project is setup with two development tools:
+
+* [Dialyzer](http://erlang.org/doc/man/dialyzer.html) (via [Dialyxir](https://github.com/jeremyjh/dialyxir)) is a static source code and bytecode analysis tool for the Erlang VM. It can be run with `mix dialyzer`. (The first time it will take some time to compile all the stdlib and create its lookup files in `~/.mix`. Successive runs will be fast.)
+* [Credo](https://github.com/rrrene/credo) is a static source code analysis tool for Elixir. It's very similar to Ruby's Rubocop. It can be run with `mix credo`.
 
 ## Configure
 
@@ -98,7 +120,7 @@ Redis is a runtime requirement. In the development and test environment the clie
 $ redis-server
 ```
 
-### Terminal commands
+### Terminal Commands
 
 To start a REPL console:
 

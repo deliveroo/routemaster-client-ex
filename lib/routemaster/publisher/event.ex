@@ -7,15 +7,27 @@ defmodule Routemaster.Publisher.Event do
   would still be present with their keys pointing to nil values,
   and the generated JSON would be larger.
 
-  Fields
+  ## Fields
 
   * `type`, e.g. created, updated.
   * `url`, the canonical URL where the resource can be found.
   * `timestamp`, time of the event (optional).
-  * `data`, an optional payload (optional).
+  * `data`, a payload (optional).
 
   See `Routemaster.Drain.Event` for the incoming events.
   """
+
+  @type type :: binary
+  @type url :: binary
+  @type timestamp :: non_neg_integer
+  @type data :: (map | list)
+
+  @type t :: %{
+    required(:type) => type,
+    required(:url) => url,
+    required(:timestamp) => timestamp,
+    optional(:data) => data
+  }
 
   alias Routemaster.Utils
 
@@ -24,6 +36,7 @@ defmodule Routemaster.Publisher.Event do
   Builds a compact Map from the four event attributes, ignoring `nil` data
   values. The timestamp is always set.
   """
+  @spec build(type, url, (timestamp | nil), (data | nil)) :: t
   def build(type, url, nil, nil) do
     %{type: type, url: url, timestamp: Utils.now()}
   end
@@ -41,6 +54,12 @@ defmodule Routemaster.Publisher.Event do
   end
 
 
+  @doc """
+  Validates that the event map is complete and correct. It raises a
+  `Routemaster.Publisher.Event.ValidationError` exception if the map
+  is invalid.
+  """
+  @spec validate!(t) :: nil
   def validate!(event) do
     _valid_url! event.url
     _valid_timestamp! event.timestamp

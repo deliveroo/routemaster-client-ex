@@ -17,8 +17,11 @@ defmodule Routemaster.Drain.JsonDecoder do
   The caller expects this to raise exceptions in case of failures.
 
   This decoder is only used to parse JSON payloads received from the bus.
-  Since the body should always be a list, if it's not raise an error.
+  The JSON body received from the bus should always be a list, so if it valid
+  JSON but is not a list this function will raise a `Routemaster.Drain.JsonDecoder.InvalidPayloadError`
+  exception.
   """
+  @spec decode!(binary) :: list
   def decode!(body) do
     case Poison.decode!(body, as: [%Event{}]) do
       list when is_list(list) ->

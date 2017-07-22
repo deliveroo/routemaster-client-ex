@@ -8,14 +8,17 @@ defmodule Routemaster.Topic do
   @doc """
   Checks if a string is a valid topic name. Returns a boolean.
   """
+  @spec valid_name?(binary) :: boolean
   def valid_name?(name) do
     Regex.match? @format, name
   end
 
 
   @doc """
-  Validates a topic name, raises an exception if invalid.
+  Validates a topic name, raises a `Routemaster.Topic.InvalidNameError`
+  exception if invalid.
   """
+  @spec validate_name!(binary) :: nil
   def validate_name!(name) do
     unless valid_name?(name) do
       raise __MODULE__.InvalidNameError, name
