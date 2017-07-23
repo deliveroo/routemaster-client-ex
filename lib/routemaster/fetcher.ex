@@ -63,7 +63,7 @@ defmodule Routemaster.Fetcher do
   defp do_authenticate!(env) do
     %{host: host} = URI.parse(env.url)
 
-    auth_header = 
+    auth_header =
       case Config.service_auth_for(host) do
         {:ok, auth} ->
           %{"Authorization" => auth}

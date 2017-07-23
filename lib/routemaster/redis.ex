@@ -15,7 +15,11 @@ defmodule Routemaster.Redis do
   def worker_spec(type) do
     import Supervisor.Spec, only: [worker: 3]
     name = String.to_atom("rm_#{type}_redis")
-    worker(Redix, [Config.redis_config(type), [name: name, sync_connect: false]], [restart: :permanent, id: name])
+    worker(
+      Redix,
+      [Config.redis_config(type), [name: name, sync_connect: false]],
+      [restart: :permanent, id: name]
+    )
   end
 
 

@@ -5,6 +5,8 @@ defmodule Routemaster.Application do
 
   use Application
 
+  alias Routemaster.Redis
+
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
@@ -12,8 +14,8 @@ defmodule Routemaster.Application do
     DeferredConfig.populate(:routemaster)
 
     children = [
-      Routemaster.Redis.worker_spec(:data),
-      Routemaster.Redis.worker_spec(:cache),
+      Redis.worker_spec(:data),
+      Redis.worker_spec(:cache),
     ]
 
     opts = [strategy: :one_for_one, name: Routemaster.Supervisor]
