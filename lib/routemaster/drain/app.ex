@@ -17,6 +17,7 @@ defmodule Routemaster.Drain.App do
   # Must be use'd after the debugger.
   use Plug.ErrorHandler
 
+  plug Drain.Plugs.Auth
 
   # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
   plug Drain.Plugs.Parser

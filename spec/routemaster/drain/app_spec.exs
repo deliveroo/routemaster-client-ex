@@ -5,11 +5,12 @@ defmodule Routemaster.Drain.AppSpec do
   import Routemaster.TestUtils
   alias Routemaster.Drain.App
   alias Routemaster.Drain.Event
+  alias Routemaster.Config
 
   @opts App.init([])
 
 
-  describe "for valid requests (POST requests to the root path)" do
+  describe "for valid requests (authenticated POST requests to the root path)" do
     let :path, do: "/"
     let :conn, do: post!(path(), payload())
     # JSON bodies with root-level arrays are put in a _json field
@@ -79,6 +80,7 @@ defmodule Routemaster.Drain.AppSpec do
 
       let :conn do
         conn("GET", path(), payload())
+        |> authenticate()
         |> put_req_header("content-type", "application/json")
         |> App.call(@opts)
       end
@@ -97,6 +99,7 @@ defmodule Routemaster.Drain.AppSpec do
       let :conn do
         the_conn = 
           conn("POST", path(), payload())
+          |> authenticate()
           |> put_req_header("content-type", "application/x-www-form-urlencoded")
 
         try do
@@ -123,6 +126,7 @@ defmodule Routemaster.Drain.AppSpec do
       let :conn do
         the_conn = 
           conn("POST", path(), payload())
+          |> authenticate()
           |> put_req_header("content-type", "application/json")
 
         try do
@@ -140,6 +144,35 @@ defmodule Routemaster.Drain.AppSpec do
         expect body |> to(be_empty())
       end
     end
+
+    describe "for POST requests without authentication" do
+      let :path, do: "/"
+      let :payload, do: "[]"
+
+      let :conn, do: unauthenticated_post!(path(), payload())
+
+      it "responds with 401" do
+        expect conn().status |> to(eq 401)
+        expect conn().resp_body |> to(be_empty())
+      end
+    end
+
+    describe "for POST requests with unrecognized authentication tokens" do
+      let :path, do: "/"
+      let :payload, do: "[]"
+
+      let :conn do
+        conn("POST", path(), payload())
+        |> authenticate("not-a-good-token")
+        |> put_req_header("content-type", "application/json")
+        |> App.call(@opts)
+      end
+
+      it "responds with 403" do
+        expect conn().status |> to(eq 403)
+        expect conn().resp_body |> to(be_empty())
+      end
+    end
   end
 
 
@@ -147,9 +180,21 @@ defmodule Routemaster.Drain.AppSpec do
   # and the content-type must be set. Using a Map instead will
   # automatically set the content-type to multipart.
   #
-  def post!(path, body) when is_binary(body) do
+  def unauthenticated_post!(path, body) when is_binary(body) do
     conn("POST", path, body)
     |> put_req_header("content-type", "application/json")
     |> App.call(@opts)
+  end
+
+  def post!(path, body) when is_binary(body) do
+    conn("POST", path, body)
+    |> authenticate()
+    |> put_req_header("content-type", "application/json")
+    |> App.call(@opts)
+  end
+
+  def authenticate(conn, token \\ Config.drain_token) do
+    encoded_tolen = Base.encode64(token <> ":x")
+    put_req_header(conn, "authorization", "Basic #{encoded_tolen}")
   end
 end
