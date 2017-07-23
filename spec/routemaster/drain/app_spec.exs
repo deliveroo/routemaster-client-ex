@@ -194,7 +194,7 @@ defmodule Routemaster.Drain.AppSpec do
   end
 
   def authenticate(conn, token \\ Config.drain_token) do
-    encoded_tolen = Base.encode64(token <> ":x")
-    put_req_header(conn, "authorization", "Basic #{encoded_tolen}")
+    encoded_token = Base.encode64(token <> ":x")
+    put_req_header(conn, "authorization", "Basic #{encoded_token}")
   end
 end
