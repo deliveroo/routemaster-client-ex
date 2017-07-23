@@ -1,0 +1,11 @@
+#!/bin/bash
+
+source "bin/.env";
+
+build_local_drain_http_auth_token() {
+    local plaintext_drain_token="$1";
+    local encoded_drain_token=$(echo -n "$plaintext_drain_token:x" | base64);
+    echo -n "Basic $encoded_drain_token";
+}
+
+build_local_drain_http_auth_token $ROUTEMASTER_DRAIN_TOKEN
