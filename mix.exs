@@ -40,7 +40,7 @@ defmodule Routemaster.Mixfile do
   defp deps do
     [
       {:redix, "~> 0.6.1"},
-      {:plug, "~> 1.3"},
+      {:plug, "~> 1.4"},
       {:cowboy, "~> 1.1", optional: true},
       {:poison, "~> 3.1"},
       {:tesla, "~> 0.7.1"},
