@@ -53,19 +53,19 @@ defmodule Routemaster.Drain.Plugs.Auth do
   end
 
 
-  def _missing_auth! do
+  defp _missing_auth! do
     Logger.info "Routemaster.Drain: event delivery request without authentication (401, unauthorized)."
     {:error, 401}
   end
 
 
-  def _invalid_auth! do
+  defp _invalid_auth! do
     Logger.info "Routemaster.Drain: event delivery request with invalid authentication (401, unauthorized)."
     {:error, 401}
   end
 
 
-  def _failed_auth! do
+  defp _failed_auth! do
     Logger.info "Routemaster.Drain: event delivery request with unrecognized authentication (403, forbidden)."
     {:error, 403}
   end
