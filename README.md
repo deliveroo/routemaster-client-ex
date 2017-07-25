@@ -136,11 +136,16 @@ To start a local **drain server** with attached REPL:
 $ bin/drain
 ```
 
-Once it's running, you can send it requests with:
+Once it's running, you can send it authenticated requests with:
 
+```bash
+curl -i --data "[]" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: $(bin/build_drain_auth)" \
+    http://127.0.0.1:4000/
 ```
-$ curl -i --data "[]" -H "content-type: application/json" http://127.0.0.1:4000/
-```
+
+The `bin/build_drain_auth` script will generate a HTTP Basic auth value from the `ROUTEMASTER_DRAIN_TOKEN` var set in your `bin/.env` file.
 
 `mix` and `iex` processes will trap the first `SIGINT` they receive. To terminate them, use `^c` (<kbd>ctrl + c</kbd>) twice.
 
