@@ -10,8 +10,17 @@ defmodule Routemaster.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    # load config from the ENV
-    DeferredConfig.populate(:routemaster)
+    if Code.ensure_loaded?(DeferredConfig) do
+      # When used in a project, if the
+      # deferred_config package is included
+      # in the parent application, then load
+      # the configuration from the unix ENV.
+      #
+      # deferred_config is an optional dependency,
+      # and this block is always executed when
+      # working on this library in development.
+      DeferredConfig.populate(:routemaster)
+    end
 
     children = [
       Redis.worker_spec(:data),
