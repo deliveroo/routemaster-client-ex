@@ -98,9 +98,9 @@ This project is setup with two development tools:
 
 ## Configure
 
-This library is configured with [`Mix.Config`](https://hexdocs.pm/mix/Mix.Config.html#content). It supports Phoenix-style system tuples to dynamically read its configuration from the environment, which means that it can be configured at runtime (on boot) rather than at compile-time.
+This library is configured with [`Mix.Config`](https://hexdocs.pm/mix/Mix.Config.html#content). It optionally supports Phoenix-style system tuples to dynamically read its configuration from the environment, which means that it can be configured at runtime (on boot) rather than at compile-time.
 
-Whil using the environment is optional, it's the recommended way to configure a [12-factor application](https://12factor.net/), and it allows to reuse the compiled artifacts with different configurations.
+While using the environment is optional, it's the recommended way to configure a [12-factor application](https://12factor.net/) and it allows to reuse the compiled artifacts with different configurations. When using this library in a project, in order to read the configuration from the env you must declare the optional dependency [`deferred_config`](https://github.com/mrluc/deferred_config) in the project mix file.
 
 You can consult the [`config.exs`](https://github.com/deliveroo/routemaster-client-ex/blob/master/config/config.exs) file for the options that should be set in your application's Mix config, and the [`bin/.env.example`](https://github.com/deliveroo/routemaster-client-ex/blob/master/bin/.env.example) file shows which environment variables are supported.
 
