@@ -39,8 +39,9 @@ defmodule Routemaster.Fetcher do
   @spec get(binary) :: {:ok, any} | {:error, http_status}
   def get(url) do
     case request(method: :get, url: url) do
-      %{status: 200, body: body, headers: _headers} ->
-        {:ok, body}
+      %{status: 200, body: body, headers: _headers} = resp ->
+        # {:ok, body}
+        resp
       %{status: status} ->
         {:error, status}
     end

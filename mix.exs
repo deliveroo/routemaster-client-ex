@@ -53,6 +53,9 @@ defmodule Routemaster.Mixfile do
 
       {:espec, "~> 1.4", only: :test},
       {:bypass, "~> 0.8.0", only: :test},
+
+      {:benchee, "~> 0.9.0", only: :dev},
+      {:benchee_html, "~> 0.3.1", only: :dev},
     ]
   end
 

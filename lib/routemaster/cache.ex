@@ -40,15 +40,33 @@ defmodule Routemaster.Cache do
       iex> Routemaster.Cache.read(:pear)
       {:ok, [1, 2, 3]}
   """
-  @spec write(atom | binary, any) :: {:ok, any} | {:error, any}
-  def write(key, term) do
-    case @redis.setex(key, @ttl, serialize(term)) do
+  # @spec write(atom | binary, any) :: {:ok, any} | {:error, any}
+  def write_0(key, term) do
+    case @redis.setex(key, @ttl, serialize_0(term)) do
       {:ok, "OK"} ->
         {:ok, term}
       {:error, _} = error ->
         error
     end
   end
+
+  def write_1(key, term) do
+    case @redis.setex(key, @ttl, serialize_1(term)) do
+      {:ok, "OK"} ->
+        {:ok, term}
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  def write_9(key, term) do
+      case @redis.setex(key, @ttl, serialize_9(term)) do
+        {:ok, "OK"} ->
+          {:ok, term}
+        {:error, _} = error ->
+          error
+      end
+    end
 
   @doc """
   Tries to read `key` from the cache, and returns the stored value
@@ -69,7 +87,7 @@ defmodule Routemaster.Cache do
   def fetch(key, fallback) do
     case read(key) do
       {:miss, _} ->
-        write(key, fallback.())
+        write_0(key, fallback.())
       {:ok, _} = value ->
         value
       {:error, _} = error ->
@@ -97,6 +115,16 @@ defmodule Routemaster.Cache do
   end
 
 
-  defp serialize(term),   do: :erlang.term_to_binary(term)
-  defp deserialize(data), do: :erlang.binary_to_term(data)
+  def serialize_9(term) do
+    :erlang.term_to_binary(term, compressed: 9)
+  end
+  def serialize_1(term) do
+    :erlang.term_to_binary(term, compressed: 1)
+  end
+  def serialize_0(term) do
+    :erlang.term_to_binary(term)
+  end
+  def deserialize(data) do
+    :erlang.binary_to_term(data)
+  end
 end
