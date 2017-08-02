@@ -9,6 +9,7 @@ defmodule Routemaster.Fetcher do
   use Tesla, docs: false, only: []
 
   alias Routemaster.Config
+  alias Routemaster.Fetcher
 
   adapter Tesla.Adapter.Hackney, Config.fetcher_http_options
 
@@ -18,6 +19,8 @@ defmodule Routemaster.Fetcher do
   unless Mix.env == :test do
     plug Tesla.Middleware.Logger
   end
+
+  plug Fetcher.Middleware.Caching
 
   plug :authenticate!
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
@@ -35,10 +38,18 @@ defmodule Routemaster.Fetcher do
   It expects all URLs and services to require an Authorization HTTP header,
   and it will raise an exception if no auth credentials can be found for
   a given URL.
+
+  ## Options
+
+  - `cache` (boolean): whether the cache should be checked before the
+  request and populated after the request. Defaults to `true`, set this
+  to `false` to entirely skip the cache layer.
   """
-  @spec get(binary) :: {:ok, any} | {:error, http_status}
-  def get(url) do
-    case request(method: :get, url: url) do
+  @spec get(binary, Keyword.t) :: {:ok, any} | {:error, http_status}
+  def get(url, options \\ []) do
+    opts = [cache: Keyword.get(options, :cache, true)]
+
+    case request(method: :get, url: url, opts: opts) do
       %{status: 200, body: body, headers: _headers} ->
         {:ok, body}
       %{status: status} ->

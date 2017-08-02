@@ -97,6 +97,6 @@ defmodule Routemaster.Cache do
   end
 
 
-  defp serialize(term),   do: :erlang.term_to_binary(term)
+  defp serialize(term),   do: :erlang.term_to_binary(term, compressed: 1)
   defp deserialize(data), do: :erlang.binary_to_term(data)
 end
