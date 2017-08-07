@@ -35,6 +35,8 @@ defmodule Routemaster.TestUtils do
   # end
 
 
+  # This will maim any JSON that contains strings with legit whitespace.
+  #
   def compact_string(str) do
     String.replace(str, ~r/\s+/, "")
   end
