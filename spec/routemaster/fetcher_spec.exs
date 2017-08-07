@@ -155,7 +155,7 @@ defmodule Routemaster.FetcherSpec do
           end
         end
 
-        context "when the cache layer is NOT enabled (the default)" do
+        context "when the cache layer is NOT enabled" do
           subject Fetcher.get(make_url("/foo/1"), cache: false)
 
           it "does NOT cache the response" do
