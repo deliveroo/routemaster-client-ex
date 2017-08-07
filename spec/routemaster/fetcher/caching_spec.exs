@@ -23,7 +23,7 @@ defmodule Routemaster.Fetcher.CachingSpec do
 
 
   let :resp_status, do: 200
-  let :resp_body, do: ~s<{ "foo" : "I am a live HTTP response body" }>
+  let :resp_body, do: %{"foo" => "I am a live HTTP response body"}
 
   let(:resp_env) do
     %Tesla.Env{
@@ -121,7 +121,7 @@ defmodule Routemaster.Fetcher.CachingSpec do
 
     describe "when there is a cached response for the URL" do
       let(:cached_resp_env) do
-        %{resp_env() | body: ~s<{ "foo" : "I'm cached!" }>}
+        %{resp_env() | body: %{"foo" => "I'm cached!"}}
       end
 
       let :terminator do
@@ -164,7 +164,7 @@ defmodule Routemaster.Fetcher.CachingSpec do
 
     describe "when there is a cached response for the URL" do
       let(:cached_resp_env) do
-        %{resp_env() | body: ~s<{ "foo" : "I'm cached!" }>}
+        %{resp_env() | body: %{"foo" => "I'm cached!"}}
       end
 
       before do
