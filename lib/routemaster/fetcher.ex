@@ -22,7 +22,7 @@ defmodule Routemaster.Fetcher do
 
   plug Tesla.Middleware.Headers, %{"accept" => "application/json"}
 
-  plug Fetcher.Middleware.Caching
+  plug Fetcher.Caching
 
   plug :authenticate!
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2

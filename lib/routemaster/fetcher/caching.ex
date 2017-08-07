@@ -1,4 +1,4 @@
-defmodule Routemaster.Fetcher.Middleware.Caching do
+defmodule Routemaster.Fetcher.Caching do
   @moduledoc """
   Response caching middleware.
 
