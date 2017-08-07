@@ -3,6 +3,7 @@ defmodule Routemaster.FetcherSpec do
 
   import Routemaster.TestUtils
   alias Routemaster.Fetcher
+  alias Routemaster.Cache
   alias Plug.Conn
 
   # Based on the `service_auth_credentials` for localhost
@@ -45,12 +46,15 @@ defmodule Routemaster.FetcherSpec do
 
 
   describe "get(url)" do
+    before_all do: clear_redis_test_db(Routemaster.Redis.cache())
+
     before do
       bypass = Bypass.open(port: 4567)
       {:shared, bypass: bypass}
     end
 
     finally do
+      clear_redis_test_db(Routemaster.Redis.cache())
       Bypass.verify_expectations!(shared.bypass)
     end
 
@@ -103,7 +107,7 @@ defmodule Routemaster.FetcherSpec do
     end
 
 
-    describe "the response" do
+    describe "the response, with no cached value" do
       before do
         response_status = status()
         response_body = raw_body()
@@ -138,16 +142,76 @@ defmodule Routemaster.FetcherSpec do
           {:ok, data} = subject()
           expect data |> to(eq parsed_body())
         end
+
+        context "when the cache layer is enabled (the default)" do
+          it "caches the response" do
+            req_url = make_url("/foo/1")
+
+            expect Cache.read(req_url) |> to(eq {:miss, nil})
+            {:ok, data} = subject()
+            expect Cache.read(req_url) |> to_not(eq {:miss, nil})
+
+            {:ok, %{body: ^data}} = Cache.read(req_url)
+          end
+        end
+
+        context "when the cache layer is NOT enabled (the default)" do
+          subject Fetcher.get(make_url("/foo/1"), cache: false)
+
+          it "does NOT cache the response" do
+            req_url = make_url("/foo/1")
+
+            expect Cache.read(req_url) |> to(eq {:miss, nil})
+            subject()
+            expect Cache.read(req_url) |> to(eq {:miss, nil})
+          end
+        end
       end
 
       context "with a NON successful response" do
         let :status, do: 400
         let :raw_body, do: ""
 
-
         it "returns an error with the HTTP status code" do
           expect subject() |> to(eq {:error, 400})
         end
+
+        it "does NOT cache the response even though the cache layer is enabled (the default)" do
+          req_url = make_url("/foo/1")
+
+          expect Cache.read(req_url) |> to(eq {:miss, nil})
+          {:error, 400} = subject()
+          expect Cache.read(req_url) |> to(eq {:miss, nil})
+        end
+      end
+    end
+
+
+    describe "the response, if a cached response is available" do
+      let :url_path, do: "/foo/1"
+      let :full_url, do: make_url(url_path())
+      let :resp_body, do: %{"foo" => "bar"}
+
+      let(:resp_env) do
+        %Tesla.Env{
+          status: 200,
+          body: resp_body(),
+          headers: %{"content-type": "application/json"}
+        }
+      end
+
+      before do
+        Cache.write full_url(), resp_env()
+        # Return `nil` because `Cache.write` returns a `{:ok, value}` tuple,
+        # that ESpec would interpret as an attempt to make `value` available
+        # to the tests and would fail if `value` is not an enumerable.
+        nil
+      end
+
+      it "returns the cached response, without executing the request" do
+        expect subject() |> to(eq {:ok, resp_body()})
+        # If a request was performed, this would raise an exception because
+        # there is not open Bypass listening on localhost:port.
       end
     end
   end
