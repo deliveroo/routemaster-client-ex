@@ -5,6 +5,8 @@ defmodule Routemaster.FetcherSpec do
   alias Routemaster.Fetcher
   alias Plug.Conn
 
+  # Based on the `service_auth_credentials` for localhost
+  # configured for the test environment.
   @localhost_basic_auth "Basic YS11c2VyOmEtdG9rZW4="
 
   describe "authenticate!" do
@@ -85,6 +87,21 @@ defmodule Routemaster.FetcherSpec do
 
       subject()
     end
+
+
+    it "sets an 'application/json' Accept HTTP header" do
+      Bypass.expect_once shared.bypass, "GET", "/foo/1", fn conn ->
+        [accept_h|[]] = Conn.get_req_header conn, "accept"
+        expect accept_h |> to(eq "application/json")
+
+        conn
+        |> Conn.resp(200, "{}")
+        |> Conn.put_resp_content_type("application/json")
+      end
+
+      subject()
+    end
+
 
     describe "the response" do
       before do

@@ -20,6 +20,8 @@ defmodule Routemaster.Fetcher do
     plug Tesla.Middleware.Logger
   end
 
+  plug Tesla.Middleware.Headers, %{"accept" => "application/json"}
+
   plug Fetcher.Middleware.Caching
 
   plug :authenticate!
