@@ -40,7 +40,10 @@ defmodule Routemaster.Fetcher.Caching do
 
 
   def call(env, next, _options) do
-    if env.opts[:cache] do
+    cache_enabled = env.opts[:cache]
+    env = %{env | opts: Keyword.delete(env.opts, :cache)}
+
+    if cache_enabled do
       lookup_or_fetch(env, next)
     else
       http_request(env, next)
