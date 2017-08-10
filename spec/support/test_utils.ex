@@ -47,4 +47,12 @@ defmodule Routemaster.TestUtils do
     {:ok, data} = Poison.decode(body)
     data
   end
+
+
+  # Based on the `service_auth_credentials` for localhost
+  # configured for the test environment.
+  #
+  def localhost_basic_auth do
+    "Basic YS11c2VyOmEtdG9rZW4="
+  end
 end

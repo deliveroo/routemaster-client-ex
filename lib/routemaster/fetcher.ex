@@ -23,8 +23,8 @@ defmodule Routemaster.Fetcher do
   plug Tesla.Middleware.Headers, %{"accept" => "application/json"}
 
   plug Fetcher.Caching
+  plug Fetcher.ServiceAuth
 
-  plug :authenticate!
   plug Tesla.Middleware.Retry, delay: 100, max_retries: 2
   plug Tesla.Middleware.DecodeJson
   plug Tesla.Middleware.Headers, %{"user-agent" => Config.user_agent}
@@ -57,33 +57,5 @@ defmodule Routemaster.Fetcher do
       %{status: status} ->
         {:error, status}
     end
-  end
-
-
-  @doc """
-  Dynamic middleware. Adds a HTTP Basic auth header for the current
-  host. It raises an exception if there are no credentials configured
-  for a host.
-  """
-  @spec authenticate!(Tesla.Env.t, list) :: Tesla.Env.t
-  def authenticate!(env, next) do
-    env
-    |> do_authenticate!
-    |> Tesla.run(next)
-  end
-
-
-  defp do_authenticate!(env) do
-    %{host: host} = URI.parse(env.url)
-
-    auth_header =
-      case Config.service_auth_for(host) do
-        {:ok, auth} ->
-          %{"Authorization" => auth}
-        :error ->
-          raise "Unknown credentials for #{host}"
-      end
-
-    Map.update!(env, :headers, &Map.merge(&1, auth_header))
   end
 end

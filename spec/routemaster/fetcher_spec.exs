@@ -6,44 +6,6 @@ defmodule Routemaster.FetcherSpec do
   alias Routemaster.Cache
   alias Plug.Conn
 
-  # Based on the `service_auth_credentials` for localhost
-  # configured for the test environment.
-  @localhost_basic_auth "Basic YS11c2VyOmEtdG9rZW4="
-
-  describe "authenticate!" do
-    let :env, do: %Tesla.Env{url: url()}
-
-    # Passing an empty list for the Testla stack will ensure
-    # that "Tesla.run(env, next)" is a noop.
-    #
-    subject Fetcher.authenticate!(env(), [])
-
-    context "with a known host" do
-      let :url, do: "https://localhost/hamsters/1"
-
-      it "sets the Authentication HTTP header in the env" do
-        %Tesla.Env{headers: headers} = env()
-        expect headers |> to(be_map())
-        expect headers |> to(be_empty())
-        expect headers["Authorization"] |> to(be_nil())
-
-        %Tesla.Env{headers: headers} = subject()
-        expect headers |> to(be_map())
-        expect headers |> to_not(be_empty())
-        expect headers["Authorization"] |> to(eq @localhost_basic_auth)
-      end
-    end
-
-    context "with an unknown host" do
-      let :url, do: "https://unknown.com/rabbits/1"
-
-      it "raises an exception" do
-        expect fn()-> subject() end
-        |> to(raise_exception RuntimeError, "Unknown credentials for unknown.com")
-      end
-    end
-  end
-
 
   describe "get(url)" do
     before_all do: clear_redis_test_db(Routemaster.Redis.cache())
@@ -82,7 +44,7 @@ defmodule Routemaster.FetcherSpec do
     it "sets the correct Authorization HTTP header" do
       Bypass.expect_once shared.bypass, "GET", "/foo/1", fn conn ->
         [auth_h|[]] = Conn.get_req_header conn, "authorization"
-        expect auth_h |> to(eq @localhost_basic_auth)
+        expect auth_h |> to(eq localhost_basic_auth())
 
         conn
         |> Conn.resp(200, "{}")
