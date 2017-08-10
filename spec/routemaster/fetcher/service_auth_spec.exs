@@ -1,5 +1,5 @@
 defmodule Routemaster.Fetcher.ServiceAuthSpec do
-  use ESpec
+  use ESpec, async: true
 
   import Routemaster.TestUtils
   alias Routemaster.Fetcher.ServiceAuth

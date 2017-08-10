@@ -1,5 +1,5 @@
 defmodule Routemaster.Middleware.BaseUrlSpec do
-  use ESpec
+  use ESpec, async: true
 
   alias Routemaster.Config
 

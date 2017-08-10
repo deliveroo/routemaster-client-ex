@@ -1,5 +1,5 @@
 defmodule Routemaster.Middleware.BasicAuthSpec do
-  use ESpec
+  use ESpec, async: true
 
   describe "Tesla.Middleware.BasicAuth" do
     alias Routemaster.Middleware.BasicAuth
