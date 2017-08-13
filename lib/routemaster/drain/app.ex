@@ -22,6 +22,8 @@ defmodule Routemaster.Drain.App do
   # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
   plug Drain.Plugs.Parser
 
+  plug Drain.Plugs.FetchAndCache
+
   # required by Plug
   plug :match
   plug :dispatch
