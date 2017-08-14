@@ -6,10 +6,7 @@ alias Routemaster.Fetcher
 alias Routemaster.Publisher
 alias Routemaster.Director
 
-# Starts a local echo service to simlate a remote service.
-#
-dummy_service_server = fn() ->
-  {:ok, _} = Routemaster.DummyService.run()
+if Mix.env == :dev do
+  # Starts a local echo service to simlate a remote service.
+  {:ok, _} = Routemaster.DummyService.start()
 end
-
-dummy_service_server.()

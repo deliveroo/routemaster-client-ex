@@ -12,21 +12,29 @@ defmodule Routemaster.DummyService do
   """
 
   require Logger
+
   use Plug.Builder
+
+  alias Plug.Conn
+  alias Routemaster.Config
+
+
+  plug :log_request
+  plug :authenticate
+  plug :respond
+
 
   @doc """
   Starts the dummy service server on localhost:4242.
   """
-  def run do
+  def start do
     Plug.Adapters.Cowboy.http(__MODULE__, [], port: 4242)
   end
 
 
-  @doc false
-  def call(conn, opts) do
+  defp respond(conn = %{state: :sent}, _opts), do: conn
+  defp respond(conn, _opts) do
     conn
-    |> log_request_time()
-    |> super(opts)
     |> put_resp_content_type("application/json")
     |> send_resp(200, echo_response(conn))
   end
@@ -57,13 +65,32 @@ defmodule Routemaster.DummyService do
   end
 
 
+  # Don't bother doing a base64-decode. Just compare the
+  # encoded values.
+  #
+  def authenticate(conn, _opts) do
+    # this will either be 127.0.0.1 or localhost
+    {:ok, auth} = Config.service_auth_for(conn.host)
+
+    case Conn.get_req_header(conn, "authorization") do
+      [^auth] ->
+        conn
+      _ ->
+        conn
+        |> Conn.put_resp_header("www-authenticate", "Basic")
+        |> Conn.send_resp(401, "")
+        |> Conn.halt()
+    end
+  end
+
+
   # ----------------------------------------------------------------
   # shamelessly borrowed from `Plug.Logger`
   #
-  defp log_request_time(conn) do
+  defp log_request(conn, _opts) do
     start = System.monotonic_time()
 
-    Plug.Conn.register_before_send(conn, fn conn ->
+    Conn.register_before_send(conn, fn conn ->
       Logger.debug fn ->
         stop = System.monotonic_time()
         diff = System.convert_time_unit(stop - start, :native, :micro_seconds)
@@ -83,5 +110,3 @@ defmodule Routemaster.DummyService do
   defp formatted_diff(diff), do: [Integer.to_string(diff), "µs"]
   # ----------------------------------------------------------------
 end
-
-
