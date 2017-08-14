@@ -6,6 +6,10 @@ alias Routemaster.Fetcher
 alias Routemaster.Publisher
 alias Routemaster.Director
 
-drain_server = fn() ->
-  {:ok, _} = Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [])
+# Starts a local echo service to simlate a remote service.
+#
+dummy_service_server = fn() ->
+  {:ok, _} = Routemaster.DummyService.run()
 end
+
+dummy_service_server.()
