@@ -17,6 +17,7 @@ defmodule Routemaster.DummyService do
 
   alias Plug.Conn
   alias Routemaster.Config
+  alias Routemaster.Utils
 
 
   plug :log_request
@@ -61,14 +62,16 @@ defmodule Routemaster.DummyService do
 
 
   defp random_time_ago do
-    DateTime.utc_now |> DateTime.to_iso8601
+    (Utils.now - Enum.random(5..100))
+    |> DateTime.from_unix!
+    |> DateTime.to_iso8601
   end
 
 
   # Don't bother doing a base64-decode. Just compare the
   # encoded values.
   #
-  def authenticate(conn, _opts) do
+  defp authenticate(conn, _opts) do
     # this will either be 127.0.0.1 or localhost
     {:ok, auth} = Config.service_auth_for(conn.host)
 
