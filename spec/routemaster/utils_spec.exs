@@ -50,4 +50,28 @@ defmodule Routemaster.UtilsSpec do
       |> to(eq "Basic #{shared.token}")
     end
   end
+
+
+  describe "debug_message(title, message, color)" do
+    subject(
+      Utils.debug_message("foo", "bar baz", :magenta)
+    )
+
+    let :io_list do
+      [[[[[[[[[[[] | "\e[35m"] | "\e[1m"], "["], "foo"], "]"] | "\e[22m"], 32], "bar baz"] | "\e[0m"] | "\e[0m"]
+    end
+
+    let :str do
+      "\e[35m\e[1m[foo]\e[22m bar baz\e[0m\e[0m"
+    end
+
+    it "returns a IO list" do
+      expect subject() |> to(eq io_list())
+    end
+
+    specify "the returned IO list can be used as a shell escaped string" do
+      expect IO.iodata_to_binary(subject())
+      |> to(eq "\e[35m\e[1m[foo]\e[22m bar baz\e[0m\e[0m")
+    end
+  end
 end

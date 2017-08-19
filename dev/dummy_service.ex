@@ -98,12 +98,15 @@ defmodule Routemaster.DummyService do
         stop = System.monotonic_time()
         diff = System.convert_time_unit(stop - start, :native, :micro_seconds)
 
-        [
-          IO.ANSI.magenta(),
-          "[DummyService] ", conn.method, ?\s, conn.request_path, " - Sent ",
-          Integer.to_string(conn.status), " in ", formatted_diff(diff),
-          IO.ANSI.reset()
-        ]
+        Utils.debug_message(
+          "DummyService",
+          [
+            conn.method, ?\s, conn.request_path,
+            " - Sent ", Integer.to_string(conn.status),
+            " in ", formatted_diff(diff)
+          ],
+          :magenta
+        )
       end
       conn
     end)

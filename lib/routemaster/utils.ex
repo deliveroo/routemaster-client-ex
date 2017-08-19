@@ -33,4 +33,33 @@ defmodule Routemaster.Utils do
     token = Base.encode64(username <> ":" <> password)
     "Basic #{token}"
   end
+
+
+  @doc """
+  Returns a formatted and ANSI-escaped string, useful to
+  produce consistent color coded log messages in development.
+
+  
+  For example, this code:
+
+      Logger.debug fn() ->
+        Utils.debug_message(
+          "My Context",
+          ["A string", ["or", "a"], "IO-list"],
+          :red
+        )
+      end
+
+  Will produce this logger output in the terminal, with the
+  formatted message coloured in red:
+
+  ```text
+  10:00:42.123 [debug] [My Context] A string or a IO-list
+  ```
+  """
+  @spec debug_message(iodata, iodata, atom) :: iodata
+  def debug_message(title, message, color) do
+    [color, :bright, "[", title, "]", :normal, ?\s, message, :reset]
+    |> IO.ANSI.format()
+  end
 end
