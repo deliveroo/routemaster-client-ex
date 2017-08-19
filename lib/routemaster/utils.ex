@@ -59,7 +59,7 @@ defmodule Routemaster.Utils do
   """
   @spec debug_message(iodata, iodata, atom) :: iodata
   def debug_message(title, message, color) do
-    [color, :bright, "[", title, "]", :normal, ?\s, message, :reset]
+    [color, :bright, "[", title, "]", :normal, ?\s, message]
     |> IO.ANSI.format()
   end
 end

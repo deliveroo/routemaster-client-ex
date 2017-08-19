@@ -79,7 +79,9 @@ defmodule Routemaster.Config do
       {:ok, value} ->
         value
       :error ->
-        Logger.debug "Routemaster: loading bus server auth credentials"
+        Logger.debug fn ->
+          Utils.debug_message("Config", "loading bus server auth credentials", :white)
+        end
         data = Utils.build_auth_header(api_token(), "x")
         Application.put_env(@app, :api_auth_header, data, persistent: true)
         data
@@ -176,7 +178,10 @@ defmodule Routemaster.Config do
   # The values are properly split and stored in a lookup Map.
   #
   defp load_service_auth_credentials do
-    Logger.debug "Routemaster: loading service auth credentials"
+    Logger.debug fn ->
+      Utils.debug_message("Config", "loading service auth credentials", :white)
+    end
+
     try do
       @app
       |> Application.get_env(:service_auth_credentials)

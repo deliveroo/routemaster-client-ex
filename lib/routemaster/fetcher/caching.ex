@@ -56,6 +56,9 @@ defmodule Routemaster.Fetcher.Caching do
 
     case Cache.read(key) do
       {:ok, data} ->
+        Logger.debug fn ->
+          Routemaster.Utils.debug_message("Fetcher.Caching", "cache hit for #{key}", :blue)
+        end
         data
       {:miss, _} ->
         http_request_and_cache(env, next, key)
