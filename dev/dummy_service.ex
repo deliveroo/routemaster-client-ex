@@ -96,7 +96,7 @@ defmodule Routemaster.DummyService do
     Conn.register_before_send(conn, fn conn ->
       Logger.debug fn ->
         stop = System.monotonic_time()
-        diff = System.convert_time_unit(stop - start, :native, :micro_seconds)
+        diff = System.convert_time_unit(stop - start, :native, :microseconds)
 
         Utils.debug_message(
           "DummyService",
