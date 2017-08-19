@@ -1,0 +1,28 @@
+# To be executed from other scripts
+
+set -e
+
+# This only works when executing the scripts from the root directory.
+config_file="bin/_env";
+
+# Print to stderr
+print() {
+    echo -e $@ 1>&2;
+}
+
+if [[ -s $config_file ]];
+then
+    if ! [[ "$1" == "--no-confirmation" ]]; # ಠ_ಠ
+    then
+        print "\033[33;32mLoading ENV config from $config_file\033[0m";
+    fi
+    source $config_file;
+else
+    print "\033[0;31mI can't find any configuration in $config_file, the file
+    could be missing or empty.
+    \nThe library won't work.
+    \nIn order to work locally in development you should create a $config_file
+    file. The bin/_env.example file documents the required variables you need
+    to set.\033[0m";
+    exit 1;
+fi

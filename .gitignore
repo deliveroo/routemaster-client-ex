@@ -23,4 +23,4 @@ erl_crash.dump
 dump.rdb
 
 # this should include auth tokens and other settings
-bin/.env
+bin/_env

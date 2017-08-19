@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source "bin/_load_config.sh";
+source bin/_load_config;
 
 iex -S mix run -e "Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [], port: 4000)"
