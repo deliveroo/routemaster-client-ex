@@ -18,7 +18,7 @@ defmodule Routemaster.Publisher do
   # for the entire stack.
   #
   unless Mix.env == :test do
-    plug Tesla.Middleware.Logger
+    plug Routemaster.Middleware.Logger, context: "Publisher"
   end
 
   plug Routemaster.Middleware.BaseUrl

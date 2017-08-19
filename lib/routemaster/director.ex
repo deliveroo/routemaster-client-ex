@@ -17,7 +17,7 @@ defmodule Routemaster.Director do
   # for the entire stack.
   #
   unless Mix.env == :test do
-    plug Tesla.Middleware.Logger
+    plug Routemaster.Middleware.Logger, context: "Director"
   end
 
   plug Routemaster.Middleware.BaseUrl

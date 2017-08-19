@@ -17,7 +17,7 @@ defmodule Routemaster.Fetcher do
   # for the entire stack.
   #
   unless Mix.env == :test do
-    plug Tesla.Middleware.Logger
+    plug Routemaster.Middleware.Logger, context: "Fetcher"
   end
 
   plug Tesla.Middleware.Headers, %{"accept" => "application/json"}
