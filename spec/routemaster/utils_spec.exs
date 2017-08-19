@@ -58,7 +58,7 @@ defmodule Routemaster.UtilsSpec do
     )
 
     let :io_list do
-      [[[[[[[[[[[] | "\e[35m"] | "\e[1m"], "["], "foo"], "]"] | "\e[22m"], 32], "bar baz"] | "\e[0m"] | "\e[0m"]
+      [[[[[[[[[[] | "\e[35m"] | "\e[1m"], "["], "foo"], "]"] | "\e[22m"], 32], "bar baz"] | "\e[0m"]
     end
 
     it "returns a IO list" do
@@ -67,7 +67,7 @@ defmodule Routemaster.UtilsSpec do
 
     specify "the returned IO list can be used as a shell escaped string" do
       expect IO.iodata_to_binary(subject())
-      |> to(eq "\e[35m\e[1m[foo]\e[22m bar baz\e[0m\e[0m")
+      |> to(eq "\e[35m\e[1m[foo]\e[22m bar baz\e[0m")
     end
   end
 end
