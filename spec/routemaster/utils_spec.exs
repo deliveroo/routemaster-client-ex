@@ -61,10 +61,6 @@ defmodule Routemaster.UtilsSpec do
       [[[[[[[[[[[] | "\e[35m"] | "\e[1m"], "["], "foo"], "]"] | "\e[22m"], 32], "bar baz"] | "\e[0m"] | "\e[0m"]
     end
 
-    let :str do
-      "\e[35m\e[1m[foo]\e[22m bar baz\e[0m\e[0m"
-    end
-
     it "returns a IO list" do
       expect subject() |> to(eq io_list())
     end
