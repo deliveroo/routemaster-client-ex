@@ -6,6 +6,8 @@ alias Routemaster.Fetcher
 alias Routemaster.Publisher
 alias Routemaster.Director
 
-drain_server = fn() ->
-  {:ok, _} = Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [])
+if Mix.env == :dev do
+  # Starts a local echo service to simulate a remote service.
+  # The echo service will accept traffic on http://localhost:4242
+  {:ok, _} = Routemaster.DummyService.start()
 end
