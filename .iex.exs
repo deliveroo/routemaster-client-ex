@@ -7,6 +7,7 @@ alias Routemaster.Publisher
 alias Routemaster.Director
 
 if Mix.env == :dev do
-  # Starts a local echo service to simlate a remote service.
+  # Starts a local echo service to simulate a remote service.
+  # The echo service will accept traffic on http://localhost:4242
   {:ok, _} = Routemaster.DummyService.start()
 end

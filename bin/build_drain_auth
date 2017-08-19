@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Development script.
+#
+# This script will create a HTTP Authorization header value to
+# authenticate requests to the local Drain application, running
+# on a local server.
+
 source bin/_load_config --no-confirmation;
 
 build_local_drain_http_auth_token() {

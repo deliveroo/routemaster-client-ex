@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Development script.
+#
+# This script runs an Elixir REPL console in the context of the library.
+# This is useful to use the Director, Publisher and Fetcher
+# modules, for example, but also to test any other function.
+
 source bin/_load_config;
 
 iex -S mix

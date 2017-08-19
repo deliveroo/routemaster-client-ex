@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Development script.
+#
+# This script runs an Elixir REPL console in the context of the library
+# and also a local webserver for the Drain application, all in the same
+# Unix process.
+# The REPL is exactly the same as executing bin/console, but when running
+# alongside the Drain app it allows to debug the Drain and the rest of
+# the HTTP server machinery.
+#
+# The Drain app will accept traffic on http://localhost:4000
+
 source bin/_load_config;
 
 iex -S mix run -e "Plug.Adapters.Cowboy.http(Routemaster.Drain.App, [], port: 4000)"
