@@ -19,7 +19,7 @@ defmodule Routemaster.Middleware.Logger do
   end
 
 
-  defp log_error(env, %Tesla.Error{message: message}, context) do
+  defp log_error(env, %{message: message}, context) do
     Logger.error fn ->
       "[#{context}] #{normalize_method(env)} #{env.url} -> #{message}"
     end

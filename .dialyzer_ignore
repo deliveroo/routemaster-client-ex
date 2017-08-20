@@ -1,0 +1,8 @@
+# Warnings that dialyzer should ignore for various reasons
+
+# This is because DeferredConfig is an optional dependency
+:0: Unknown function 'Elixir.DeferredConfig':populate/1
+
+# These are apparently a known issue
+lib/routemaster/middleware/logger.ex:18: Guard test is_binary(_@6::#{'__exception__':='true', '__struct__':=_, 'message':=_, _=>_}) can never succeed
+lib/routemaster/middleware/logger.ex:18: Guard test is_atom(_@7::#{'__exception__':='true', '__struct__':=_, 'message':=_, _=>_}) can never succeed

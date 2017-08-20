@@ -15,7 +15,7 @@ defmodule Routemaster.Mixfile do
       deps: deps(),
       preferred_cli_env: [espec: :test],
       elixirc_paths: elixirc_paths(Mix.env),
-      dialyzer: [flags: [:error_handling, :race_conditions]],
+      dialyzer: dialyzer(),
     ]
   end
 
@@ -53,6 +53,14 @@ defmodule Routemaster.Mixfile do
 
       {:espec, "~> 1.4", only: :test},
       {:bypass, "~> 0.8.0", only: :test},
+    ]
+  end
+
+
+  def dialyzer do
+    [
+      flags: [:error_handling, :race_conditions],
+      ignore_warnings: ".dialyzer_ignore",
     ]
   end
 
