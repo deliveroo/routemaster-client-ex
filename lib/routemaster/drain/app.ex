@@ -1,14 +1,14 @@
 defmodule Routemaster.Drain.App do
   @moduledoc """
-    A Plug to receive events over HTTP.
+  A Plug to receive events over HTTP.
   """
 
-  use Plug.Router
+  use Plug.Builder
   alias Routemaster.Drain
 
   if Mix.env == :dev do
     # Only log in dev, as the host application already
-    # takes care of request loggins in production.
+    # takes care of request logging in production.
     plug Plug.Logger, log: :debug
   end
 
@@ -17,6 +17,8 @@ defmodule Routemaster.Drain.App do
   # Must be use'd after the debugger.
   use Plug.ErrorHandler
 
+  plug Drain.Plugs.RootPostOnly
+
   plug Drain.Plugs.Auth
 
   # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
@@ -24,10 +26,7 @@ defmodule Routemaster.Drain.App do
 
   plug Drain.Plugs.FetchAndCache
 
-  # required by Plug
-  plug :match
-  plug :dispatch
-
+  plug Drain.Plugs.Terminator
 
   @doc false
   def init(opts) do
@@ -35,19 +34,19 @@ defmodule Routemaster.Drain.App do
     super(opts)
   end
 
-
-  # Main (only?) endpoint, to receive events from the event bus
+  # Make the compile-time options available to each request.
+  # This allows to customize some nested module with options
+  # passed to the public drain app.
   #
-  post "/" do
-    send_resp(conn, 204, "")
-  end
-
-
-  # black hole for all other requests
+  # Available data:
+  #  - conn.assigns.events
+  #  - conn.assigns.init_opts
   #
-  match _ do
-    status = if conn.method == "POST", do: 404, else: 405
-    send_resp(conn, status, "")
+  @doc false
+  def call(conn, opts) do
+    conn
+    |> assign(:init_opts, opts)
+    |> super(opts)
   end
 
 
