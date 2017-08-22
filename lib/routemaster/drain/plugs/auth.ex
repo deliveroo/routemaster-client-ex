@@ -1,5 +1,10 @@
 defmodule Routemaster.Drain.Plugs.Auth do
-  @moduledoc false
+  @moduledoc """
+  Authenticates event delivery requests from the bus server
+  to the Drain app.
+
+  In case of failures it responds with 401 or 403.
+  """
 
   alias Routemaster.Config
   alias Plug.Conn

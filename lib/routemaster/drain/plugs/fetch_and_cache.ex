@@ -1,8 +1,12 @@
 defmodule Routemaster.Drain.Plugs.FetchAndCache do
   @moduledoc """
-  This plug will iterate through the list of event payloads
-  in `conn` and, for each one, start a supervised `Task` to
-  fetch the data asynchronously.
+  This plug iterates through the list of event payloads
+  in `conn` and, for each one, starts a supervised `Task`
+  to fetch the data asynchronously.
+
+  Ideally, this should be an entry point to add adapters
+  for different async backends, for example independent
+  background job processors (e.g. exq, verk or toniq).
   """
 
   require Logger

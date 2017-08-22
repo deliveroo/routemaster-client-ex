@@ -1,5 +1,10 @@
 defmodule Routemaster.Drain.Plugs.Parser do
-  @moduledoc false
+  @moduledoc """
+  Parses the request bodies of incoming event delivery requests
+  to extract the event list payloads.
+
+  Uses `Routemaster.Drain.JsonDecoder`.
+  """
 
   use Plug.Builder
 
