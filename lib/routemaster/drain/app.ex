@@ -40,12 +40,12 @@ defmodule Routemaster.Drain.App do
   #
   # Available data:
   #  - conn.assigns.events
-  #  - conn.assigns.init_opts
+  #  - conn.assigns.drain_opts
   #
   @doc false
   def call(conn, opts) do
     conn
-    |> assign(:init_opts, opts)
+    |> assign(:drain_opts, opts)
     |> super(opts)
   end
 
