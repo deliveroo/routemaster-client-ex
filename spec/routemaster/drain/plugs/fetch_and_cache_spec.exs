@@ -63,14 +63,17 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
     before do
       Bypass.expect_once shared.bypass, "GET", "/foo/1" , fn conn ->
         Conn.resp(conn, 200, ~s<{"foo":1}>)
+        |> Conn.put_resp_content_type("application/json")
       end
 
       Bypass.expect_once shared.bypass, "GET", "/bar/2" , fn conn ->
         Conn.resp(conn, 200, ~s<{"bar":2}>)
+        |> Conn.put_resp_content_type("application/json")
       end
 
       Bypass.expect_once shared.bypass, "GET", "/baz/3" , fn conn ->
         Conn.resp(conn, 200, ~s<{"baz":3}>)
+        |> Conn.put_resp_content_type("application/json")
       end
     end
 
@@ -83,9 +86,9 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
         subject()
         :timer.sleep(100)
 
-        {:ok, %Tesla.Env{status: 200, body: "{\"foo\":1}"}} = Cache.read("http://localhost:4567/foo/1")
-        {:ok, %Tesla.Env{status: 200, body: "{\"bar\":2}"}} = Cache.read("http://localhost:4567/bar/2")
-        {:ok, %Tesla.Env{status: 200, body: "{\"baz\":3}"}} = Cache.read("http://localhost:4567/baz/3")
+        {:ok, %Tesla.Env{status: 200, body: %{"foo" => 1}}} = Cache.read("http://localhost:4567/foo/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"bar" => 2}}} = Cache.read("http://localhost:4567/bar/2")
+        {:ok, %Tesla.Env{status: 200, body: %{"baz" => 3}}} = Cache.read("http://localhost:4567/baz/3")
       end
     end
 
@@ -104,9 +107,9 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
         subject()
         :timer.sleep(100)
 
-        {:ok, %Tesla.Env{status: 200, body: "{\"foo\":1}"}} = Cache.read("http://localhost:4567/foo/1")
-        {:ok, %Tesla.Env{status: 200, body: "{\"bar\":2}"}} = Cache.read("http://localhost:4567/bar/2")
-        {:ok, %Tesla.Env{status: 200, body: "{\"baz\":3}"}} = Cache.read("http://localhost:4567/baz/3")
+        {:ok, %Tesla.Env{status: 200, body: %{"foo" => 1}}} = Cache.read("http://localhost:4567/foo/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"bar" => 2}}} = Cache.read("http://localhost:4567/bar/2")
+        {:ok, %Tesla.Env{status: 200, body: %{"baz" => 3}}} = Cache.read("http://localhost:4567/baz/3")
       end
     end
   end
