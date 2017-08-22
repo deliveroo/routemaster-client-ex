@@ -6,8 +6,24 @@ defmodule Routemaster.Drain.AppSpec do
   alias Routemaster.Drain.App
   alias Routemaster.Drain.Event
   alias Routemaster.Config
+  alias Routemaster.Cache
+  alias Plug.Conn
 
   @opts App.init([])
+
+  # Use this as the URL of the events, so requests will stay local.
+  #
+  # Tests that check some failure condition (e.g. no auth, bad format),
+  # will not execute any request because the plug chain is halted early.
+  #
+  # Happy path tests will attempt to execute the requests, and these
+  # will fail without bypass listening on the port. If we don't care
+  # for the side effect (successful response and data fetched), we
+  # can let them fail and, since they're async, the tests will still
+  # pass.
+  #
+  @port 33445
+  @base_url "http://localhost:#{@port}"
 
 
   describe "for valid requests (authenticated POST requests to the root path)" do
@@ -27,15 +43,51 @@ defmodule Routemaster.Drain.AppSpec do
       it "parses and decodes the JSON" do
         expect decoded_json() |> to(eq [])
       end
+
+      # and it does nothing.
     end
 
     context "with some events" do
-      let :payload, do: "[#{make_drain_event(1)},#{make_drain_event(2)}]"
+      let :payload do
+        "[#{make_drain_event("/dinosaurs/1", @port)},#{make_drain_event("/dinosaurs/2", @port)}]"
+      end
+
+      before do
+        clear_redis_test_db(Routemaster.Redis.cache())
+        bypass = Bypass.open(port: @port)
+
+        Bypass.expect_once bypass, "GET", "/dinosaurs/1", fn(conn) ->
+          conn
+          |> Conn.resp(200, ~s<{"dino":1}>)
+          |> Conn.put_resp_content_type("application/json")
+        end
+
+        Bypass.expect_once bypass, "GET", "/dinosaurs/2", fn(conn) ->
+          conn
+          |> Conn.resp(200, ~s<{"dino":2}>)
+          |> Conn.put_resp_content_type("application/json")
+        end
+
+        {:shared, bypass: bypass}
+      end
+
+      finally do
+        clear_redis_test_db(Routemaster.Redis.cache())
+        Bypass.verify_expectations!(shared.bypass)
+      end
+
+      defp wait_for_async_fetch_requests_to_complete do
+        :timer.sleep(50)
+      end
+
 
       it "responds with 204 and no body" do
         expect conn().status |> to(eq 204)
         expect conn().resp_body |> to(be_empty())
+
+        wait_for_async_fetch_requests_to_complete()
       end
+
 
       it "parses and decodes the JSON" do
         [e1, e2] = decoded_json()
@@ -43,15 +95,27 @@ defmodule Routemaster.Drain.AppSpec do
         expect e1 |> to(be_struct Event)
         expect e2 |> to(be_struct Event)
 
-        # See `make_drain_event/1` for details.
-        %Event{data: nil, t: t1, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/1"} = e1
-        %Event{data: nil, t: t2, topic: "dinosaurs", type: "update", url: "https://example.com/dinosaurs/2"} = e2
+        %Event{data: nil, t: t1, topic: "dinosaurs", type: "update", url: "#{@base_url}/dinosaurs/1"} = e1
+        %Event{data: nil, t: t2, topic: "dinosaurs", type: "update", url: "#{@base_url}/dinosaurs/2"} = e2
 
         expect t1 |> to(be_close_to (now() - 2), 1)
         expect t2 |> to(be_close_to (now() - 2), 1)
+
+        wait_for_async_fetch_requests_to_complete()
+      end
+
+
+      it "fetches and catches the data" do
+        {:miss, nil} = Cache.read("#{@base_url}/dinosaurs/1")
+        {:miss, nil} = Cache.read("#{@base_url}/dinosaurs/2")
+
+        conn()
+        wait_for_async_fetch_requests_to_complete()
+
+        {:ok, %Tesla.Env{status: 200, body: %{"dino" => 1}}} = Cache.read("#{@base_url}/dinosaurs/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"dino" => 2}}} = Cache.read("#{@base_url}/dinosaurs/2")
       end
     end
-
 
     # context "more examples here" do
     #   it "pending" do

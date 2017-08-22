@@ -28,8 +28,11 @@ defmodule Routemaster.TestUtils do
     DateTime.utc_now() |> DateTime.to_unix()
   end
 
-  def make_drain_event(index) do
-    ~s({"type":"update","topic":"dinosaurs","url":"https://example.com/dinosaurs/#{index}","t":#{now() - 2}})
+  # Requires paths to be in the form "/something/42"
+  #
+  def make_drain_event(path, port \\ 45678) do
+    topic = path |> String.split("/") |> Enum.at(1)
+    ~s({"type":"update","topic":"#{topic}","url":"http://localhost:#{port}#{path}","t":#{now() - 2}})
   end
   # def make_drain_event(index, data) do
   # end
