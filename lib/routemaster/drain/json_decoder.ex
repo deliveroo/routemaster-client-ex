@@ -1,6 +1,6 @@
 defmodule Routemaster.Drain.JsonDecoder do
   @moduledoc """
-  Wraps Poison to explicitly decode JSON into `%Drain.Event{}` structures.
+  Wraps Poison to explicitly decode JSON into `Routemaster.Drain.Event` structures.
   """
   alias Routemaster.Drain.Event
 

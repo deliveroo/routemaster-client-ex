@@ -25,6 +25,19 @@ defmodule Routemaster.Application do
     children = [
       Redis.worker_spec(:data),
       Redis.worker_spec(:cache),
+
+      # To dynamically spawn async tasks to process the events
+      # received by the Drain, _without_ linking the tasks to
+      # the caller process that is handling the HTTP request.
+      #
+      # https://hexdocs.pm/elixir/Task.Supervisor.html#start_link/1
+      #
+      supervisor(Task.Supervisor, [[
+        name: DrainEventHandler.TaskSupervisor,
+        restart: :transient,
+        # Default values. Tweak to control how failing tasks are handled.
+        # max_restarts: 3, max_seconds: 5
+      ]]),
     ]
 
     opts = [strategy: :one_for_one, name: Routemaster.Supervisor]
