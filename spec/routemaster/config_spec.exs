@@ -151,4 +151,11 @@ defmodule Routemaster.ConfigSpec do
       expect Config.service_auth_for("unknown.host.com") |> to(eq :error)
     end
   end
+
+
+  describe "cache_ttl" do
+    it "returns an integer number of seconds" do
+      expect Config.cache_ttl |> to(eq "86400")
+    end
+  end
 end
