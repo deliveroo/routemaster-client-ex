@@ -19,18 +19,37 @@ defmodule Routemaster.Drain.Plugs.FetchAndCache do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    Enum.each(conn.assigns.events, &async_fetch(&1.url))
+    Enum.each(conn.assigns.events, &async_fetch(&1))
     conn
   end
 
 
-  defp async_fetch(url) do
+  defp async_fetch(event) do
     Task.Supervisor.start_child(@supervisor, fn() ->
       Logger.debug fn ->
-        Utils.debug_message("Drain.FetchAndCache", "fetching #{url}", :yellow)
+        Utils.debug_message("Drain.FetchAndCache", "fetching #{event.url}", :yellow)
       end
-      Cache.clear(url)
-      Fetcher.get(url) # this will automatically re-cache it
+      cache_bust(event)
+      fetch(event.url)
     end)
+  end
+
+
+  # Don't bust the cache if the event is a noop
+  #
+  defp cache_bust(%{type: "noop"}), do: nil
+  defp cache_bust(%{url: url}),     do: Cache.clear(url)
+
+
+  # If there is no data yet, or if the cache has just been busted,
+  # then this will automatically fetch and cache the data.
+  #
+  # If the event is a noop (and the caceh has not been busted), then
+  # we still want this to check the cache first, so that we can do
+  # nothing if the cached value is present or fetch the resource if
+  # the cache was already empty (e.g. if we're backfilling a new cache).
+  #
+  defp fetch(url) do
+    Fetcher.get(url)
   end
 end
