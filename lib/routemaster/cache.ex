@@ -4,10 +4,10 @@ defmodule Routemaster.Cache do
   backed by Redis.
   """
 
+  alias Routemaster.Config
+
   @type fallback :: (() -> any)
 
-  # todo: make this configurable or dynamic
-  @ttl to_string(3600) # seconds
   @redis Routemaster.Redis.cache()
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Routemaster.Cache do
   """
   @spec write(atom | binary, any) :: {:ok, any} | {:error, any}
   def write(key, term) do
-    case @redis.setex(key, @ttl, serialize(term)) do
+    case @redis.setex(key, Config.cache_ttl, serialize(term)) do
       {:ok, "OK"} ->
         {:ok, term}
       {:error, _} = error ->

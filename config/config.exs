@@ -29,6 +29,8 @@ config :routemaster, :drain_url,
 config :routemaster, :service_auth_credentials,
   {:system, "ROUTEMASTER_SERVICE_AUTH_CREDENTIALS"}
 
+config :routemaster, :cache_ttl, "86400"
+
 # These match the hackney defaults and are here just as an example.
 #
 # config :routemaster, :director_http_options,

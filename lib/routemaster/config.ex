@@ -211,4 +211,15 @@ defmodule Routemaster.Config do
       auth -> {:ok, auth}
     end
   end
+
+
+  @doc """
+  The cache TTL, as an integer number of seconds represented
+  as a string.
+  Defaults to one day (86400 seconds).
+  """
+  @spec cache_ttl() :: binary
+  def cache_ttl do
+    Application.get_env(@app, :cache_ttl, "86400")
+  end
 end
