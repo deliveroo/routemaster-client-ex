@@ -48,14 +48,14 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
   end
 
 
-  describe "with some events" do
+  describe "with some events (no noop's)" do
     let :events do
       [
         %Routemaster.Drain.Event{data: nil, t: 1502651912, topic: "foo",
           type: "create", url: "http://localhost:4567/foo/1"},
-       %Routemaster.Drain.Event{data: %{"qwe" => [1, 2, 3]}, t: 1502651912,
+        %Routemaster.Drain.Event{data: %{"qwe" => [1, 2, 3]}, t: 1502651912,
           topic: "bar", type: "update", url: "http://localhost:4567/bar/2"},
-       %Routemaster.Drain.Event{data: nil, t: 1502651912, topic: "baz",
+        %Routemaster.Drain.Event{data: nil, t: 1502651912, topic: "baz",
           type: "delete", url: "http://localhost:4567/baz/3"}
       ]
     end
@@ -97,6 +97,7 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
         Cache.write("http://localhost:4567/foo/1", 1234)
         Cache.write("http://localhost:4567/bar/2", 1234)
         Cache.write("http://localhost:4567/baz/3", 1234)
+        :ok
       end
 
       it "fetches the resources and populate their caches" do
@@ -110,6 +111,61 @@ defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
         {:ok, %Tesla.Env{status: 200, body: %{"foo" => 1}}} = Cache.read("http://localhost:4567/foo/1")
         {:ok, %Tesla.Env{status: 200, body: %{"bar" => 2}}} = Cache.read("http://localhost:4567/bar/2")
         {:ok, %Tesla.Env{status: 200, body: %{"baz" => 3}}} = Cache.read("http://localhost:4567/baz/3")
+      end
+    end
+  end
+
+  describe "with some noop events" do
+    let :events do
+      [
+        %Routemaster.Drain.Event{data: nil, t: 1502651912, topic: "foo",
+          type: "noop", url: "http://localhost:4567/foo/1"},
+        %Routemaster.Drain.Event{data: nil, t: 1502651912, topic: "bar",
+          type: "noop", url: "http://localhost:4567/bar/2"},
+      ]
+    end
+
+    context "when there is no previously cached value" do
+      before do
+        Bypass.expect_once shared.bypass, "GET", "/foo/1" , fn conn ->
+          Conn.resp(conn, 200, ~s<{"foo":1}>)
+          |> Conn.put_resp_content_type("application/json")
+        end
+
+        Bypass.expect_once shared.bypass, "GET", "/bar/2" , fn conn ->
+          Conn.resp(conn, 200, ~s<{"bar":2}>)
+          |> Conn.put_resp_content_type("application/json")
+        end
+      end
+
+      it "fetches the resources and populate their caches" do
+        {:miss, nil} = Cache.read("http://localhost:4567/foo/1")
+        {:miss, nil} = Cache.read("http://localhost:4567/bar/2")
+
+        subject()
+        :timer.sleep(100)
+
+        {:ok, %Tesla.Env{status: 200, body: %{"foo" => 1}}} = Cache.read("http://localhost:4567/foo/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"bar" => 2}}} = Cache.read("http://localhost:4567/bar/2")
+      end
+    end
+
+    context "when there are some previously cached values" do
+      before do
+        Cache.write("http://localhost:4567/foo/1", %Tesla.Env{status: 200, body: %{"foo" => "cached"}})
+        Cache.write("http://localhost:4567/bar/2", %Tesla.Env{status: 200, body: %{"bar" => "cached"}})
+        :ok
+      end
+
+      it "doesn't bust the caches and doesn't load new data" do
+        {:ok, %Tesla.Env{status: 200, body: %{"foo" => "cached"}}} = Cache.read("http://localhost:4567/foo/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"bar" => "cached"}}} = Cache.read("http://localhost:4567/bar/2")
+
+        subject()
+        :timer.sleep(100)
+
+        {:ok, %Tesla.Env{status: 200, body: %{"foo" => "cached"}}} = Cache.read("http://localhost:4567/foo/1")
+        {:ok, %Tesla.Env{status: 200, body: %{"bar" => "cached"}}} = Cache.read("http://localhost:4567/bar/2")
       end
     end
   end
