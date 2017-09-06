@@ -83,6 +83,10 @@ defmodule Routemaster.Redis do
         Redix.command @conn, ["GET", ns(key)]
       end
 
+      def mget(keys) when is_list(keys) do
+        Redix.command @conn, ["MGET" | ns_all(keys)]
+      end
+
       def set(key, value) do
         Redix.command @conn, ["SET", ns(key), value]
       end
@@ -96,8 +100,7 @@ defmodule Routemaster.Redis do
       end
 
       def del(keys) when is_list(keys) do
-        key_list = Enum.map(keys, &ns/1)
-        Redix.command @conn, ["DEL" | key_list]
+        Redix.command @conn, ["DEL" | ns_all(keys)]
       end
 
       def del(key) do
@@ -108,6 +111,10 @@ defmodule Routemaster.Redis do
       #
       defp ns(base) do
         @prefix <> to_string(base)
+      end
+
+      defp ns_all(list) do
+        Enum.map(list, &ns/1)
       end
     end
   end

@@ -88,6 +88,18 @@ defmodule Routemaster.RedisSharedSpec do
     end
 
 
+    describe "MGET" do
+      it "reads the values for a list of keys, together" do
+        redis().set("one", "uno")
+        redis().set("two", "due")
+        redis().set("four", "quattro")
+
+        out = redis().mget(~w(one two three four five))
+        expect out |> to(eq {:ok, ["uno", "due", nil, "quattro", nil]})
+      end
+    end
+
+
     describe "SETEX and TTL" do
       it "SETEX sets a key with an expiration TTL, in seconds" do
         expect redis().setex(:banana, 100, "some value") |> to(eq {:ok, "OK"})
