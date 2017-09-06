@@ -5,10 +5,11 @@ defmodule Routemaster.Cache do
   """
 
   alias Routemaster.Config
+  import Routemaster.Redis, only: [serialize: 1, deserialize: 1]
 
   @type fallback :: (() -> any)
 
-  @redis Routemaster.Redis.cache()
+  @redis Routemaster.Redis.Cache
 
   @doc """
   Reads a key-value and returns an Elixr term, in a tuple.
@@ -95,8 +96,4 @@ defmodule Routemaster.Cache do
       _ -> :error
     end
   end
-
-
-  defp serialize(term),   do: :erlang.term_to_binary(term, compressed: 1)
-  defp deserialize(data), do: :erlang.binary_to_term(data)
 end

@@ -1,4 +1,54 @@
 defmodule Routemaster.RedisSpec do
+  use ESpec, async: true
+  alias Routemaster.Redis
+
+  describe "serializing and deserializing data" do
+    specify "serializing a term returns a binary" do
+      data = Redis.serialize(%{one: "two", three: [1, 2, %{"foo" => "bar"}]})
+      expect data |> to(be_binary())
+    end
+
+    describe "it is possible to convert terms to binaries and back" do
+      defp test_serialization_of(term) do
+        data = Redis.serialize(term)
+        expect Redis.deserialize(data) |> to(eq term)
+      end
+
+      specify "with strings" do
+        test_serialization_of("Hello World!")
+      end
+
+      specify "with numbers" do
+        test_serialization_of(42.42)
+      end
+
+      specify "with lists" do
+        test_serialization_of([1, "hello", 2, "world"])
+      end
+
+      specify "with tuples" do
+        test_serialization_of({:ok, "go"})
+      end
+
+      specify "with maps" do
+        test_serialization_of(%{one: "two", three: [1, 2, %{"foo" => "bar"}]})
+      end
+
+      specify "with structs" do
+        test_serialization_of(%Routemaster.TestStruct{foo: "hello", bar: [1,2,3]})
+      end
+    end
+
+    it "fails to deserialize an invalid data binary" do
+      bogus_data = "definitely not valid Erlang term format"
+      expect fn -> Redis.deserialize(bogus_data) end
+      |> to(raise_exception ArgumentError)
+    end
+  end
+end
+
+
+defmodule Routemaster.RedisSharedSpec do
   use ESpec, shared: true
   import Routemaster.TestUtils
 
@@ -151,7 +201,7 @@ defmodule Routemaster.RedisDataSpec do
   doctest Routemaster.Redis
 
   before redis: Redis.data()
-  it_behaves_like(Routemaster.RedisSpec)
+  it_behaves_like(Routemaster.RedisSharedSpec)
 end
 
 defmodule Routemaster.RedisCacheSpec do
@@ -159,5 +209,5 @@ defmodule Routemaster.RedisCacheSpec do
   alias Routemaster.Redis
 
   before redis: Redis.cache()
-  it_behaves_like(Routemaster.RedisSpec)
+  it_behaves_like(Routemaster.RedisSharedSpec)
 end

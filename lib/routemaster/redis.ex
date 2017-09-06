@@ -49,6 +49,28 @@ defmodule Routemaster.Redis do
   def cache, do: __MODULE__.Cache
 
 
+  @doc """
+  Serializes an Elixir term into a binary using Erlang's
+  [External Term Format](http://erlang.org/doc/apps/erts/erl_ext_dist.html).
+
+  The returned binary can be safely stored into Redis and
+  deserialized later.
+  """
+  @spec serialize(term) :: binary
+  def serialize(term) do
+    :erlang.term_to_binary(term, compressed: 1)
+  end
+
+  @doc """
+  Deserializes valid binary data (External Term Format)
+  back into an Elixir term.
+  """
+  @spec deserialize(binary) :: term
+  def deserialize(data) do
+    :erlang.binary_to_term(data)
+  end
+
+
   defmacro __using__(type) do
     quote do
       @prefix "rm:#{unquote(type)}:"
