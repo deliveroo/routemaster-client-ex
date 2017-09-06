@@ -13,7 +13,7 @@ defmodule Routemaster.Drain.Plugs.Dedup do
   """
 
   alias Plug.Conn
-  
+
   def init(opts), do: opts
 
 

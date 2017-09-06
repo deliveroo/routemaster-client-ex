@@ -1,6 +1,5 @@
 defmodule Routemaster.Drain.Plugs.DedupSpec do
   use ESpec, async: true
-  use Plug.Test
 
   alias Routemaster.Drain.Plugs.Dedup
   alias Routemaster.Drain.Event
