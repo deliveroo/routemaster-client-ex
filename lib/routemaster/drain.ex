@@ -57,10 +57,31 @@ defmodule Routemaster.Drain do
       #
       @doc false
       def start_async_drains(conn, _opts) do
+        # Do this _outside_ the fn passed to the task, to limit the
+        # amount of data passed between processes.
+        light_conn = strip_conn_data(conn)
+
         Task.Supervisor.start_child(@supervisor, fn() ->
-          _start_async_drains(conn, [])
+          _start_async_drains(light_conn, [])
         end)
+
         conn
+      end
+
+
+      # At this point `conn` contains multiple references to the same event
+      # payload and other data that is not really needed in the async drain
+      # pipeline. Since passing a lot of data between processes is expensive,
+      # here we strip the conn to make it lighter before passing it to the
+      # async task.
+      #
+      defp strip_conn_data(conn) do
+        %{
+          conn |
+          params: nil, body_params: nil, before_send: nil,
+          cookies: nil, req_cookies: nil, req_headers: [],
+          resp_headers: [],
+        }
       end
 
       # Either:
