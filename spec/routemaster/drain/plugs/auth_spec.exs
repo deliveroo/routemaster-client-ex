@@ -1,8 +1,8 @@
-defmodule Routemaster.Drain.Plugs.AuthSpec do
+defmodule Routemaster.Plugs.AuthSpec do
   use ESpec, async: true
   use Plug.Test
 
-  alias Routemaster.Drain.Plugs.Auth
+  alias Routemaster.Plugs.Auth
   alias Routemaster.Config
 
   @opts Auth.init([])

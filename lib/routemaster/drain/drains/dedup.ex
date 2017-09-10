@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.Dedup do
+defmodule Routemaster.Drains.Dedup do
   @moduledoc """
   Removes duplicates by URL and type from the current payload
   and only preserves the most recent event.

@@ -1,8 +1,8 @@
-defmodule Routemaster.Drain.Plugs.RootPostOnlySpec do
+defmodule Routemaster.Plugs.RootPostOnlySpec do
   use ESpec, async: true
   use Plug.Test
 
-  alias Routemaster.Drain.Plugs.RootPostOnly
+  alias Routemaster.Plugs.RootPostOnly
 
   @opts RootPostOnly.init([])
 

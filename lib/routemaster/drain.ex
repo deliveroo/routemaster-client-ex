@@ -13,9 +13,9 @@ defmodule Routemaster.Drain do
   defmodule MyApp.MyDrainApp do
     use Routemaster.Drain
 
-    drain Drain.Plugs.Dedup
-    drain Drain.Plugs.IgnoreStale
-    drain Drain.Plugs.FetchAndCache
+    drain Routemaster.Drains.Dedup
+    drain Routemaster.Drains.IgnoreStale
+    drain Routemaster.Drains.FetchAndCache
   end
 
   # Mount it into a Phoenix or Plug Router.
@@ -33,7 +33,7 @@ defmodule Routemaster.Drain do
   defmacro __using__(_opts) do
     quote do
       use Plug.Builder
-      alias Routemaster.Drain
+      alias Routemaster.Plugs
       import Routemaster.Drain, only: [drain: 1, drain: 2]
 
       @supervisor DrainPipelines.TaskSupervisor
@@ -49,16 +49,16 @@ defmodule Routemaster.Drain do
       # Must be use'd after the debugger.
       use Plug.ErrorHandler
 
-      plug Drain.Plugs.RootPostOnly
+      plug Plugs.RootPostOnly
 
-      plug Drain.Plugs.Auth
+      plug Plugs.Auth
 
       # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
-      plug Drain.Plugs.Parser
+      plug Plugs.Parser
 
       plug :start_async_drains
 
-      plug Drain.Plugs.Terminator
+      plug Plugs.Terminator
 
       @doc false
       def init(opts) do

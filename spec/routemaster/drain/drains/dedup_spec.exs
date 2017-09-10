@@ -1,7 +1,7 @@
-defmodule Routemaster.Drain.Plugs.DedupSpec do
+defmodule Routemaster.Drains.DedupSpec do
   use ESpec, async: true
 
-  alias Routemaster.Drain.Plugs.Dedup
+  alias Routemaster.Drains.Dedup
   alias Routemaster.Drain.Event
 
   @opts Dedup.init([])

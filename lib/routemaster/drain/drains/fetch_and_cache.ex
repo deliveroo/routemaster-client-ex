@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.FetchAndCache do
+defmodule Routemaster.Drains.FetchAndCache do
   @moduledoc """
   This plug iterates through the list of event payloads
   in `conn` and, for each one, starts a supervised `Task`

@@ -1,9 +1,9 @@
-defmodule Routemaster.Drain.Plugs.ParserSpec do
+defmodule Routemaster.Plugs.ParserSpec do
   use ESpec, async: true
   use Plug.Test
   import Routemaster.TestUtils
 
-  alias Routemaster.Drain.Plugs.Parser
+  alias Routemaster.Plugs.Parser
 
   @opts Parser.init([])
   subject Parser.call(conn(), @opts)
