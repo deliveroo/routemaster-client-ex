@@ -25,6 +25,7 @@ defmodule Routemaster.Drain.App do
   plug Drain.Plugs.Parser
 
   plug Drain.Plugs.Dedup
+  plug Drain.Plugs.IgnoreStale
 
   plug Drain.Plugs.FetchAndCache
 

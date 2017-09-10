@@ -27,6 +27,9 @@ defmodule Routemaster.Drain.AppSpec do
 
 
   describe "for valid requests (authenticated POST requests to the root path)" do
+    before_all do: clear_redis_test_db(Routemaster.Redis.Data)
+    finally do: clear_redis_test_db(Routemaster.Redis.Data)
+
     let :path, do: "/"
     let :conn, do: post!(path(), payload())
     # JSON bodies with root-level arrays are put in a _json field
