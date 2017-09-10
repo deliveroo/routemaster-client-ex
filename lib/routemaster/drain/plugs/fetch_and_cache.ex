@@ -14,7 +14,7 @@ defmodule Routemaster.Drain.Plugs.FetchAndCache do
   alias Routemaster.Fetcher
   alias Routemaster.Cache
 
-  @supervisor DrainEventHandler.TaskSupervisor
+  @supervisor DrainEvents.TaskSupervisor
 
   def init(opts), do: opts
 

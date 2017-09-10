@@ -5,7 +5,7 @@ defmodule Routemaster.Drain do
       alias Routemaster.Drain
       import Routemaster.Drain, only: [drain: 1, drain: 2]
 
-      @supervisor DrainAsyncHandler.TaskSupervisor
+      @supervisor DrainPipelines.TaskSupervisor
 
       if Mix.env == :dev do
         # Only log in dev, as the host application already
