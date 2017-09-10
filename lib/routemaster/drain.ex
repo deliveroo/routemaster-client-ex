@@ -3,10 +3,9 @@ defmodule Routemaster.Drain do
     quote do
       use Plug.Builder
       alias Routemaster.Drain
+      import Routemaster.Drain, only: [drain: 1, drain: 2]
 
-
-      use Plug.Builder
-      alias Routemaster.Drain
+      @supervisor DrainAsyncHandler.TaskSupervisor
 
       if Mix.env == :dev do
         # Only log in dev, as the host application already
@@ -25,6 +24,10 @@ defmodule Routemaster.Drain do
 
       # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
       plug Drain.Plugs.Parser
+
+      plug :start_async_drains
+
+      plug Drain.Plugs.Terminator
 
       @doc false
       def init(opts) do
@@ -48,6 +51,18 @@ defmodule Routemaster.Drain do
       end
 
 
+      # Start the async drains (which are plugs under a different name)
+      # in an asyncronous task, then just return the conn with a no-op
+      # to progress to the next "actual" plug and return a response.
+      #
+      @doc false
+      def start_async_drains(conn, _opts) do
+        Task.Supervisor.start_child(@supervisor, fn() ->
+          _start_async_drains(conn, [])
+        end)
+        conn
+      end
+
       # Either:
       #  - Plug.Parsers.UnsupportedMediaTypeError
       #    The request content-type is not JSON.
@@ -68,25 +83,31 @@ defmodule Routemaster.Drain do
       defp handle_errors(conn, _), do: conn
 
 
-      # Module.register_attribute(__MODULE__, :drains, accumulate: true)
-      # @before_compile Routemaster.Drain
+      Module.register_attribute(__MODULE__, :drains, accumulate: true)
+      @before_compile Routemaster.Drain
     end
   end
 
   @doc false
-  defmacro __before_compile__(_env) do
-    # drains = Module.get_attribute(env.module, :drains)
+  defmacro __before_compile__(env) do
+    drains = Module.get_attribute(env.module, :drains)
 
-    # {conn, body} = Plug.Builder.compile(env, drains)
+    # IO.puts "@drains: #{inspect drains}"
+
+    {conn, drain_pipeline} = Plug.Builder.compile(env, drains, [])
 
     quote do
-      # defp drain_builder_call(unquote(conn), _), do: unquote(body)
+      defp _start_async_drains(unquote(conn), _), do: unquote(drain_pipeline)
     end
   end
 
 
+  @doc """
+  Register a new Drain module.
+  """
   defmacro drain(drain_module, opts \\ []) do
     quote do
+      # This must be compatible with the plug specification
       @drains {unquote(drain_module), unquote(opts), true}
     end
   end

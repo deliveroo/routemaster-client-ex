@@ -6,11 +6,10 @@ defmodule Routemaster.Drain.App do
   use Routemaster.Drain
   
 
-  plug Drain.Plugs.Dedup
-  # plug Drain.Plugs.IgnoreStale
+  drain Drain.Plugs.Dedup
+  # drain Drain.Plugs.IgnoreStale
 
-  plug Drain.Plugs.FetchAndCache
+  drain Drain.Plugs.FetchAndCache
 
-  plug Drain.Plugs.Terminator
 
 end
