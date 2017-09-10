@@ -47,7 +47,7 @@ defmodule Routemaster.Drain.Plugs.IgnoreStale do
   defp filter(events) do
     events
     |> newest_by_url()
-    |> remove_stale()
+    |> remove_stale_and_update_state()
   end
 
 
@@ -63,7 +63,7 @@ defmodule Routemaster.Drain.Plugs.IgnoreStale do
   end
 
 
-  defp remove_stale(events) do
+  defp remove_stale_and_update_state(events) do
     Enum.filter events, fn(event) ->
       if EventState.fresh?(event) do
         EventState.save(event)
