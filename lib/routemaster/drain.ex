@@ -1,4 +1,35 @@
 defmodule Routemaster.Drain do
+  @moduledoc """
+  The basis of a Drain app.
+
+  This module is meant to be `use`'d into another module to build a Drain pipeline.
+
+  It's an extension of `Plug.Builder` and provides its own macro `drain/2`.
+
+
+  ```
+  # Define a Drain app, it will be a valid Plug.
+  #
+  defmodule MyApp.MyDrainApp do
+    use Routemaster.Drain
+
+    drain Drain.Plugs.Dedup
+    drain Drain.Plugs.IgnoreStale
+    drain Drain.Plugs.FetchAndCache
+  end
+
+  # Mount it into a Phoenix or Plug Router.
+  #
+  defmodule MyApp.Web.Router do
+    use MyApp.Web, :router
+
+    scope path: "/events" do
+      forward "/", MyApp.MyDrainApp
+    end
+  end
+  ```
+  """
+
   defmacro __using__(_opts) do
     quote do
       use Plug.Builder
