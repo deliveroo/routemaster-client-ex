@@ -1,7 +1,7 @@
 defmodule Routemaster.Drain.Plugs.Dedup do
   @moduledoc """
-  Removes duplicates (by url and type) from the event list and
-  only preserves the most recent event.
+  Removes duplicates by URL and type from the current payload
+  and only preserves the most recent event.
 
   This is only scoped to the current event payload, while in
   fact the Drain app could receive concurrent requests with
@@ -29,9 +29,6 @@ defmodule Routemaster.Drain.Plugs.Dedup do
   end
 
 
-  # Sorts by timestamp in descending order,
-  # then returns the first item (the newest).
-  #
   defp newest(list) do
     Enum.max_by(list, &(&1.t))
   end
