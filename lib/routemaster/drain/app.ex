@@ -9,7 +9,6 @@ defmodule Routemaster.Drain.App do
   """
 
   use Routemaster.Drain
-  
 
   drain Routemaster.Drains.Dedup
   # drain Routemaster.Drains.IgnoreStale

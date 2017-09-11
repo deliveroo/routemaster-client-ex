@@ -1,11 +1,34 @@
 defmodule Routemaster.Drain do
   @moduledoc """
-  The basis of a Drain app.
+  The foundation of a Drain app.
 
   This module is meant to be `use`'d into another module to build a Drain pipeline.
+  It's an extension of `Plug.Builder` and it's based on the same concepts.
 
-  It's an extension of `Plug.Builder` and provides its own macro `drain/2`.
+  When `use`'d it takes care of the boilerplate configuration to provide the basic
+  behaviour that a Drain app must implement.
 
+  More specifically, it defines a default Plug pipeline with these plugs, in order:
+
+  * `Routemaster.Plugs.RootPostOnly`
+  * `Routemaster.Plugs.Auth`
+  * `Routemaster.Plugs.Parser`
+  * `Routemaster.Plugs.Terminator`
+
+  It also automatically configures `Plug.Logger` (only with `Mix.env == :dev`) and
+  `Plug.ErrorHandler` to handle some common errors raised by the plugs (e.g.
+  JSON parse errors).
+
+  That, by itself, is enough to accept and validate the event-delivery POST
+  requests from the bus server and to respond with the appropriate status codes.
+  To actually _process_ the received events and do something useful with them,
+  this module provides its own `drain/2` macro to build a second _asynchronous_
+  plug pipeline. This second plug pipeline handles the events in the background
+  without blocking the HTTP response and is triggered from the main pipeline before
+  returning a response. All the plugs defined with the `drain/2` macro are
+  executed in a supervised `Task` linked to a `Task.Supervisor`.
+
+  For example:
 
   ```
   # Define a Drain app, it will be a valid Plug.
@@ -15,7 +38,14 @@ defmodule Routemaster.Drain do
 
     drain Routemaster.Drains.Dedup
     drain Routemaster.Drains.IgnoreStale
+    drain :a_function_plug, some: "options"
     drain Routemaster.Drains.FetchAndCache
+    drain MyApp.MyCustomDrain, some: "other options"
+
+    def a_function_plug(conn, opts) do
+      {:ok, stuff} = MyApp.Utils.do_something(conn.assigns.events, opts)
+      Plug.Conn.assign(conn, :stuff, stuff)
+    end
   end
 
   # Mount it into a Phoenix or Plug Router.
@@ -28,6 +58,30 @@ defmodule Routemaster.Drain do
     end
   end
   ```
+
+  Just like with the `Plug.Builder.plug/2` macro, multiple plugs can be defined
+  with the `drain/2` macro, and the plugs in the Drain pipeline will be executed
+  in the order they've been added. In the example above, `Routemaster.Drains.Dedup`
+  will be called first, followed by `Routemaster.Drains.IgnoreStale`, then the
+  `:a_function_plug` function and so on.
+
+  Again, the second drain pipeline is anynchronous and independent from the main
+  plug pipeline. The original HTTP POST request that delivers the batch of events
+  is responded to when the main plug pipeline reaches the `Terminator` plug, and
+  ideally way before the second drain pipeline has completed.
+
+  This has been done for two reasons:
+  
+  * To respond quickly and without errors not related to the HTTP request. An
+  event-delivery request from the bus server only needs to be a POST to the correct
+  path, be authenticated and with a valid JSON body containing events.
+  Once all of this has been verified without errors, there is no reason to delay the
+  response to the bus server, and it would be inappropriate to respond a 500 just
+  because something else later in the pipeline fails to process an event.
+  * With a supervised root `Task` that fans out to other independently supervised
+  tasks, errors (e.g. timeouts fetching a resource) can be handled and retried
+  with more flexibility.
+
   """
 
   defmacro __using__(_opts) do
@@ -155,7 +209,14 @@ defmodule Routemaster.Drain do
 
 
   @doc """
-  Register a new Drain module.
+  A macro that stores a new plug for the Drain pipeline. The `opts` will be
+  passed unchanged to the new plug.
+
+  ## Examples
+
+      drain Routemaster.Drains.Dedup # module plug
+      drain :foo, some_options: true # function plug
+
   """
   defmacro drain(drain_module, opts \\ []) do
     quote do
