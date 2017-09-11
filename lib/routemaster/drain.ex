@@ -104,35 +104,16 @@ defmodule Routemaster.Drain do
       use Plug.ErrorHandler
 
       plug Plugs.RootPostOnly
-
       plug Plugs.Auth
-
-      # Parse JSON bodies and automatically reject non-JSON requests with a 415 response.
       plug Plugs.Parser
-
       plug :start_async_drains
-
       plug Plugs.Terminator
+
 
       @doc false
       def init(opts) do
         Application.ensure_started(:routemaster)
         super(opts)
-      end
-
-      # Make the compile-time options available to each request.
-      # This allows to customize some nested module with options
-      # passed to the public drain app.
-      #
-      # Available data:
-      #  - conn.assigns.events
-      #  - conn.assigns.drain_opts
-      #
-      @doc false
-      def call(conn, opts) do
-        conn
-        |> assign(:drain_opts, opts)
-        |> super(opts)
       end
 
 
@@ -169,6 +150,7 @@ defmodule Routemaster.Drain do
         }
       end
 
+
       # Either:
       #  - Plug.Parsers.UnsupportedMediaTypeError
       #    The request content-type is not JSON.
@@ -185,7 +167,6 @@ defmodule Routemaster.Drain do
       defp handle_errors(conn, %{kind: :error, reason: %{plug_status: status}, stack: _}) do
         send_resp(conn, status, "")
       end
-
       defp handle_errors(conn, _), do: conn
 
 
@@ -197,9 +178,6 @@ defmodule Routemaster.Drain do
   @doc false
   defmacro __before_compile__(env) do
     drains = Module.get_attribute(env.module, :drains)
-
-    # IO.puts "@drains: #{inspect drains}"
-
     {conn, drain_pipeline} = Plug.Builder.compile(env, drains, [])
 
     quote do
