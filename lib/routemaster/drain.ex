@@ -163,8 +163,8 @@ defmodule Routemaster.Drain do
       defp strip_conn_data(conn) do
         %{
           conn |
-          params: nil, body_params: nil, before_send: nil,
-          cookies: nil, req_cookies: nil, req_headers: [],
+          params: %{}, body_params: %{}, before_send: [],
+          cookies: %{}, req_cookies: %{}, req_headers: [],
           resp_headers: [],
         }
       end
