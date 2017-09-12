@@ -49,7 +49,7 @@ In order to work locally, you must duplicate the `bin/_env.example` file as `bin
 
 ### Install an Elixir Environment
 
-The project targets the latest stable Elixir `1.4.x` release.
+The project targets the latest stable Elixir `1.5` release.
 
 Elixir requires an Erlang runtime, and the correct version of Erlang is installed automatically when installing Elixir.
 
