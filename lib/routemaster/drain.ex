@@ -128,6 +128,8 @@ defmodule Routemaster.Drain do
         light_conn = strip_conn_data(conn)
 
         Task.Supervisor.start_child(@supervisor, fn() ->
+          # Start the async drain plug pipeline. This will return a
+          # processed conn that we can discard.
           _start_async_drains(light_conn, [])
         end)
 
@@ -146,7 +148,9 @@ defmodule Routemaster.Drain do
           conn |
           params: %{}, body_params: %{}, before_send: [],
           cookies: %{}, req_cookies: %{}, req_headers: [],
-          resp_headers: [],
+          resp_headers: [], adapter: {Plug.MissingAdapter, nil},
+          owner: nil, halted: false, peer: nil, remote_ip: nil,
+          host: "", method: "", port: 0,
         }
       end
 
@@ -180,6 +184,8 @@ defmodule Routemaster.Drain do
     drains = Module.get_attribute(env.module, :drains)
     {conn, drain_pipeline} = Plug.Builder.compile(env, drains, [])
 
+    # Define the function that will start the async drain plug pipeline.
+    # The return value of this will be a Plug.Conn, which will be discarded.
     quote do
       defp _start_async_drains(unquote(conn), _), do: unquote(drain_pipeline)
     end
