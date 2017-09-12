@@ -1,7 +1,7 @@
-defmodule Routemaster.Drain.Plugs.IgnoreStaleSpec do
+defmodule Routemaster.Drains.IgnoreStaleSpec do
   use ESpec, async: false
 
-  alias Routemaster.Drain.Plugs.IgnoreStale
+  alias Routemaster.Drains.IgnoreStale
   alias Routemaster.Drain.Event
   alias Routemaster.Drain.EventState
   import Routemaster.TestUtils

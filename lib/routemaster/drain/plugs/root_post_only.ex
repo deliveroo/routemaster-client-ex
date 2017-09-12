@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.RootPostOnly do
+defmodule Routemaster.Plugs.RootPostOnly do
   @moduledoc """
   This should be the first plug to quickly reject requests other
   than `POST /`.

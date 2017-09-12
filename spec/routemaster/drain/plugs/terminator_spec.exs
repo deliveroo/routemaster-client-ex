@@ -1,8 +1,8 @@
-defmodule Routemaster.Drain.Plugs.TerminatorSpec do
+defmodule Routemaster.Plugs.TerminatorSpec do
   use ESpec, async: true
   use Plug.Test
 
-  alias Routemaster.Drain.Plugs.Terminator
+  alias Routemaster.Plugs.Terminator
 
   @opts Terminator.init([])
 

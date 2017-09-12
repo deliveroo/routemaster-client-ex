@@ -32,12 +32,25 @@ defmodule Routemaster.Application do
       #
       # https://hexdocs.pm/elixir/Task.Supervisor.html#start_link/1
       #
-      supervisor(Task.Supervisor, [[
-        name: DrainEventHandler.TaskSupervisor,
-        restart: :transient,
-        # Default values. Tweak to control how failing tasks are handled.
-        # max_restarts: 3, max_seconds: 5
-      ]]),
+      supervisor(Task.Supervisor,
+        [[
+          name: DrainEvents.TaskSupervisor,
+          restart: :transient,
+          # Default values. Tweak to control how failing tasks are handled.
+          # max_restarts: 3, max_seconds: 5
+        ]],
+        [id: :drain_events_task_supervisor]
+      ),
+
+      # To run the drains pipelines asyncronously.
+      #
+      supervisor(Task.Supervisor,
+        [[
+          name: DrainPipelines.TaskSupervisor,
+          restart: :transient,
+        ]],
+        [id: :drain_pipelines_task_supervisor]
+      ),
     ]
 
     opts = [strategy: :one_for_one, name: Routemaster.Supervisor]

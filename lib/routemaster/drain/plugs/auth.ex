@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.Auth do
+defmodule Routemaster.Plugs.Auth do
   @moduledoc """
   Authenticates event delivery requests from the bus server
   to the Drain app.

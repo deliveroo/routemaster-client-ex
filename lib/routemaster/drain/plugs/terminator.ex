@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.Terminator do
+defmodule Routemaster.Plugs.Terminator do
   @moduledoc """
   This simply returns 204, the expected response for a Drain app.
   """

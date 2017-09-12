@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.Parser do
+defmodule Routemaster.Plugs.Parser do
   @moduledoc """
   Parses the request bodies of incoming event delivery requests
   to extract the event list payloads.

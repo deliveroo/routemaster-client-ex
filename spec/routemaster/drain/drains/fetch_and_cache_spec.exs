@@ -1,9 +1,9 @@
-defmodule Routemaster.Drain.Plugs.FetchAndCacheSpec do
+defmodule Routemaster.Drains.FetchAndCacheSpec do
   use ESpec
   use Plug.Test
   import Routemaster.TestUtils
 
-  alias Routemaster.Drain.Plugs.FetchAndCache
+  alias Routemaster.Drains.FetchAndCache
   alias Routemaster.Cache
   alias Plug.Conn
 

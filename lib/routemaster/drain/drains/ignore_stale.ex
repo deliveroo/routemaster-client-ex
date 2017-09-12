@@ -1,4 +1,4 @@
-defmodule Routemaster.Drain.Plugs.IgnoreStale do
+defmodule Routemaster.Drains.IgnoreStale do
   @moduledoc """
   Drops stale events from the current payload to only include
   events that reflect an entity state that is _more recent_ than
