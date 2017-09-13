@@ -43,7 +43,7 @@ defmodule Routemaster.Drain do
     drain MyApp.MyCustomDrain, some: "other options"
 
     def a_function_plug(conn, opts) do
-      {:ok, stuff} = MyApp.Utils.do_something(conn.assigns.events, opts)
+      {:ok, stuff} = MyApp.Utils.do_something(conn.assigns.events, opts[:some])
       Plug.Conn.assign(conn, :stuff, stuff)
     end
   end

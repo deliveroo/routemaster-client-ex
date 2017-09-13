@@ -20,6 +20,10 @@ The project is a work in progress and it aims to port the functionality of the R
         + [Terminal Commands](#terminal-commands)
         + [The Dummy Local Service](#the-dummy-local-service)
 * [In Production](#in-production)
+    - [Subscribe to Topics](#subscribe-to-topics)
+    - [Receive Events With a Drain Plug](#receive-events-with-a-drain-plug)
+    - [Publish Events](#publish-events)
+    - [Fetch Remote Resources](#fetch-remote-resources)
 * [Test](#test)
 
 
@@ -166,26 +170,83 @@ In other words, this dummy service is a local target for the `Routemster.Fetcher
 
 ## In Production
 
-**WIP**
-
-You can mount the Drain app into a host Phoenix application with [`Phoenix.Router.forward/4`](https://hexdocs.pm/phoenix/Phoenix.Router.html#forward/4).
+### Subscribe to Topics
 
 ```elixir
-defmodule MyPhoenixApp.Web.Router do
-  use MyPhoenixApp.Web, :router
+Routemaster.Director.subscribe(["avocados", "bananas"])
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
+Routemaster.Director.unsubscribe("bananas")
+Routemaster.Director.unsubscribe_all()
+```
+ToDo
 
-  scope path: "/events" do
-    pipe_through :api
-    forward "/", Routemaster.Drain.ExampleApp, some: "options"
+### Receive Events With a Drain Plug
+
+The Routemaster event bus delivers events over HTTP. Once an event consumer app is subscribed to the bus, event batches for the selected topics are delivered as JSON with authenticated POST requests to the specified endpoint. This library provides conveniencies and utilities to create and configure event receiver endpoints and the event handlers that sit behind them, commonly referred to as a "Routemaster Drains".
+
+The HTTP endpoints are built as [Plugs](https://hex.pm/packages/plug), which makes them easily embeddable in their host Phoenix or generic Plug applications. The event handling pipelines are built on the same concepts.
+
+For example, a Drain app can be defined as:
+
+```elixir
+defmodule MyApp.MyDrainApp do
+  use Routemaster.Drain
+
+  drain Routemaster.Drains.Dedup
+  drain Routemaster.Drains.IgnoreStale
+  drain :a_function_plug, some: "options"
+  drain Routemaster.Drains.FetchAndCache
+  drain MyApp.MyCustomDrain, some: "other options"
+
+  def a_function_plug(conn, opts) do
+    {:ok, stuff} = MyApp.Utils.do_something(conn.assigns.events, opts[:some])
+    Plug.Conn.assign(conn, :stuff, stuff)
   end
 end
 ```
 
-The Drain app takes care of its own authentication.
+There, `use Routemaster.Drain` sets up all the necessary nuts and bolts of the HTTP endpoint. That, by itself, makes the `MyApp.MyDrainApp` module a valid module plug ready to be mounted in a router. If the library is [configured](#configuration), `MyApp.MyDrainApp` can already receive POST requests from the bus and respond with 204.
+
+The next bit is the asynchronous event processing pipeline. This is where the application gets to do something with the received event payloads. The pipeline is made of a series of processing modules ("drains") defined with the `drain/2` macro. The drains are really just plugs, and the `drain/2` macro behaves just like the [`Plug.Builder.plug/2`](https://hexdocs.pm/plug/Plug.Builder.html#plug/2) macro.
+
+The entire event processing "drain pipeline" runs asynchronously and is independent from the HTTP-specific plug pipeline (which authenticates the request, parses the request body, sets a response, etc). In fact, the drain pipeline is started in the background just before returning a successful 204 HTTP response to the bus.
+
+If the received event batch POST request is invalid for some reason (e.g. invalid auth or invalid JSON), then the drain pipeline is never started.
+
+Once a Drain app has been defined and configured, since it's a Plug, it can be mounted into a host Phoenix application with [`Phoenix.Router.forward/4`](https://hexdocs.pm/phoenix/Phoenix.Router.html#forward/4).
+
+```elixir
+defmodule MyApp.Web.Router do
+  use MyApp.Web, :router
+
+  scope path: "/events" do
+    forward "/", MyApp.MyDrainApp
+  end
+end
+```
+
+The Drain app takes care of its own authentication, and the host application should _not_ wrap it with any extra authentication logic.
+
+### Publish Events
+
+```elixir
+Routemaster.Publisher.create("pears", "https://this.app.io/api/pears/42", data: %{mmm: "pears..."})
+Routemaster.Publisher.update("pears", "https://this.app.io/api/pears/42")
+
+Routemaster.Director.get_topic("pears")
+Routemaster.Director.delete_topic("pears")
+```
+
+ToDo
+
+### Fetch Remote Resources
+
+```elixir
+Routemaster.Fetcher.get("https://remote.io/api/avocados/1337")
+Routemaster.Fetcher.get("https://remote.io/api/bananas/123", cache: false)
+```
+
+ToDo
 
 ## Test
 
