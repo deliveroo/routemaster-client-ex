@@ -1,9 +1,9 @@
-defmodule Routemaster.Drain.AppSpec do
+defmodule Routemaster.Drain.ExampleAppSpec do
   use ESpec
   use Plug.Test
 
   import Routemaster.TestUtils
-  alias Routemaster.Drain.App
+  alias Routemaster.Drain.ExampleApp, as: App
   alias Routemaster.Drain.Event
   alias Routemaster.Config
   alias Routemaster.Cache

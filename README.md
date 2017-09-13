@@ -180,7 +180,7 @@ defmodule MyPhoenixApp.Web.Router do
 
   scope path: "/events" do
     pipe_through :api
-    forward "/", Routemaster.Drain.App, some: "options"
+    forward "/", Routemaster.Drain.ExampleApp, some: "options"
   end
 end
 ```
