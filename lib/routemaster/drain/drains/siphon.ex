@@ -6,8 +6,8 @@ defmodule Routemaster.Drains.Siphon do
   function, that will be invoked with a list of `Routemaster.Drain.Event`
   structures as argument.
 
-  The listeners' `call/1` function is invoked in a supervised `Task`,
-  so all listeners are to be considered asynchronous and independent.
+  The siphons' `call/1` function is invoked in a supervised `Task`,
+  so all siphons are to be considered asynchronous and independent.
 
   This drain plug is very similar to the `Routemaster.Drains.Notify`
   module, with the difference that it modifies the event list in the
