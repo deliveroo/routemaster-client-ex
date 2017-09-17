@@ -1,4 +1,4 @@
-export ROUTEMASTER_API_TOKEN='to authenticate requests to the server'
+export ROUTEMASTER_BUS_API_TOKEN='to authenticate requests to the server'
 export ROUTEMASTER_DRAIN_TOKEN='to authenticate event deliveries from the server'
 export ROUTEMASTER_URL='https url to talk with the event bus server'
 export ROUTEMASTER_DRAIN_URL='https url that this app exposes to receive events'

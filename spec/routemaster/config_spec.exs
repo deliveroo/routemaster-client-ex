@@ -57,15 +57,15 @@ defmodule Routemaster.ConfigSpec do
     end
   end
 
-  describe "api_token" do
+  describe "bus_api_token" do
     it "returns a string" do
-      expect Config.api_token |> to(eql "a-test-api-token")
+      expect Config.bus_api_token |> to(eql "a-test-api-token")
     end
   end
 
-  describe "api_auth_header" do
+  describe "bus_api_auth_header" do
     it "returns a basic auth header value" do
-      expect Config.api_auth_header |> to(eql "Basic YS10ZXN0LWFwaS10b2tlbjp4")
+      expect Config.bus_api_auth_header |> to(eql "Basic YS10ZXN0LWFwaS10b2tlbjp4")
     end
   end
 

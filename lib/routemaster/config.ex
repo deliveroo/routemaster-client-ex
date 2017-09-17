@@ -62,28 +62,28 @@ defmodule Routemaster.Config do
   @doc """
   The API token to authenticate requests to the event bus server.
   """
-  @spec api_token :: binary
-  def api_token do
-    Application.get_env(@app, :api_token)
+  @spec bus_api_token :: binary
+  def bus_api_token do
+    Application.get_env(@app, :bus_api_token)
   end
 
 
   @doc """
   The HTTP Basic Authorization Header value to authenticate
   requests to the event bus server. It's derived from
-  a base64-encoded `Config.api_token`.
+  a base64-encoded `Config.bus_api_token`.
   """
-  @spec api_auth_header :: binary
-  def api_auth_header do
-    case Application.fetch_env(@app, :api_auth_header) do
+  @spec bus_api_auth_header :: binary
+  def bus_api_auth_header do
+    case Application.fetch_env(@app, :bus_api_auth_header) do
       {:ok, value} ->
         value
       :error ->
         Logger.debug fn ->
           Utils.debug_message("Config", "loading bus server auth credentials", :white)
         end
-        data = Utils.build_auth_header(api_token(), "x")
-        Application.put_env(@app, :api_auth_header, data, persistent: true)
+        data = Utils.build_auth_header(bus_api_token(), "x")
+        Application.put_env(@app, :bus_api_auth_header, data, persistent: true)
         data
     end
   end

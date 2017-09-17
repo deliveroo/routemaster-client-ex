@@ -30,7 +30,7 @@ defmodule Routemaster.Middleware.BasicAuth do
   # with the event bus server.
   #
   defp auth_header do
-    %{"Authorization" => Config.api_auth_header()}
+    %{"Authorization" => Config.bus_api_auth_header()}
   end
 end
 

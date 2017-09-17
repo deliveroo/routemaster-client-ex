@@ -14,8 +14,8 @@ config :routemaster, :redis_data,
   {:system, "REDIS_DATA_URL", "redis://localhost:6379/1"}
 
 
-config :routemaster, :api_token,
-  {:system, "ROUTEMASTER_API_TOKEN"}
+config :routemaster, :bus_api_token,
+  {:system, "ROUTEMASTER_BUS_API_TOKEN"}
 
 config :routemaster, :drain_token,
   {:system, "ROUTEMASTER_DRAIN_TOKEN"}
