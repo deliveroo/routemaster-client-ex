@@ -149,7 +149,9 @@ Once it's running, you can send it authenticated requests with:
 ```bash
 curl -i --data '[
     {"type":"update","url":"http://localhost:4242/hedgehogs/2","t":1502651876,"topic":"hedgehogs"},
-    {"type":"create","url":"http://localhost:4242/llamas/1","t":1502651912,"data":{"foo":"bar"},"topic":"llamas"}
+    {"type":"create","url":"http://localhost:4242/llamas/1","t":1502651912,"data":{"foo":"bar"},"topic":"llamas"},
+    {"type":"create","url":"http://localhost:4242/llamas/2","t":1502651913,"topic":"llamas"},
+    {"type":"create","url":"http://localhost:4242/rabbits/1","t":1502671234,"topic":"rabbits"}
 ]' \
     -H "Content-Type: application/json" \
     -H "Authorization: $(bin/build_drain_auth)" \
