@@ -13,4 +13,22 @@ defmodule Routemaster.Drain.ExampleApp do
   drain Routemaster.Drains.Dedup
   drain Routemaster.Drains.IgnoreStale
   drain Routemaster.Drains.FetchAndCache
+
+  drain Routemaster.Drains.Notify,
+    listener: Routemaster.ExampleListener,
+    only: ["llamas", "hedgehogs"]  
+end
+
+
+defmodule Routemaster.ExampleListener do
+  @moduledoc false
+
+  require Logger
+
+  def call(events) do
+    Logger.info """
+    [#{__MODULE__}]: #{length(events)} events received:
+    #{inspect events}
+    """
+  end
 end
