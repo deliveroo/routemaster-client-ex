@@ -52,7 +52,6 @@ defmodule Routemaster.Drains.Siphon do
   end
 
 
-
   def call(conn, [topic: topic, siphon: siphon]) do
     {matched, others} = partition(conn.assigns.events, topic)
     send_to_siphon(matched, siphon)

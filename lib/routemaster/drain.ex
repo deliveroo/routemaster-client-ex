@@ -149,8 +149,7 @@ defmodule Routemaster.Drain do
           params: %{}, body_params: %{}, before_send: [],
           cookies: %{}, req_cookies: %{}, req_headers: [],
           resp_headers: [], adapter: {Plug.MissingAdapter, nil},
-          owner: nil, halted: false, peer: nil, remote_ip: nil,
-          host: "", method: "", port: 0,
+          halted: false, host: "", method: "", port: 0,
         }
       end
 

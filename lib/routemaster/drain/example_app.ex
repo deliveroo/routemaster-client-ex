@@ -19,7 +19,7 @@ defmodule Routemaster.Drain.ExampleApp do
 
   drain Routemaster.Drains.Notify,
     listener: Routemaster.ExampleListener,
-    only: ["llamas", "hedgehogs"]  
+    only: ["llamas", "hedgehogs"]
 end
 
 
