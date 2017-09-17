@@ -174,13 +174,42 @@ In other words, this dummy service is a local target for the `Routemster.Fetcher
 
 ### Subscribe to Topics
 
+The `Director` module provides functions to subscribe to and work with topics. First, you must configure the application in your Mix config file:
+
 ```elixir
+use Mix.Config
+
+config :routemaster,
+  bus_url: "https://routemaster.server",
+  bus_api_token: "bus-server-api-token",
+  drain_url: "https://myapp.url/events",
+  drain_token: "my-app--drain-auth-token"
+```
+
+And then:
+
+```elixir
+# Subscribe to two topics
 Routemaster.Director.subscribe(["avocados", "bananas"])
 
+# The same, but with max 100 events per batch and max batch latency of 150ms
+Routemaster.Director.subscribe(["avocados", "bananas"], max: 100, timeout: 150)
+
+# Unsubscribe from one or all topics
 Routemaster.Director.unsubscribe("bananas")
 Routemaster.Director.unsubscribe_all()
+
+# Get info on the topics
+Routemaster.Director.all_topics()
+Routemaster.Director.get_topic("pears")
+
+# Delete owned topics
+Routemaster.Director.delete_topic("pears")
+
+# Get info on the subscribers
+Routemaster.Director.all_subscribers()
 ```
-ToDo
+
 
 ### Receive Events With a Drain Plug
 
@@ -233,24 +262,40 @@ The Drain app takes care of its own authentication, and the host application sho
 
 ### Publish Events
 
-```elixir
-Routemaster.Publisher.create("pears", "https://this.app.io/api/pears/42", data: %{mmm: "pears..."})
-Routemaster.Publisher.update("pears", "https://this.app.io/api/pears/42")
+The `Publisher` allows to publish events to the bus server. First, the application must be configured [as shown in the section on the topics](#subscribe-to-topics). Then:
 
-Routemaster.Director.get_topic("pears")
-Routemaster.Director.delete_topic("pears")
+```elixir
+Routemaster.Publisher.create("pears", "https://myapp.url/api/pears/42")
+Routemaster.Publisher.update("pears", "https://myapp.url/api/pears/42", data: %{mmm: "pears..."})
+Routemaster.Publisher.delete("pears", "https://myapp.url/api/pears/42")
+Routemaster.Publisher.noop("pears", "https://myapp.url/api/pears/42")
 ```
 
-ToDo
+All events support an optional `data` payload (must be serializable as JSON) and an optional `timestamp` option (will be set to the current time if missing).
 
 ### Fetch Remote Resources
 
+The `Fetcher` HTTP client provides a `get` function to retrieve resources from remote sercvices. Before using it, you must provide authentication credentials for the remote services in your app Mix config file:
+
 ```elixir
-Routemaster.Fetcher.get("https://remote.io/api/avocados/1337")
-Routemaster.Fetcher.get("https://remote.io/api/bananas/123", cache: false)
+use Mix.Config
+
+credentials =
+  "example.com:username:auth-token,otherapp.url:other-username:other-auth-token"
+
+config :routemaster, service_auth_credentials: credentials
 ```
 
-ToDo
+Currently they must be provided as a joined string to support configuring apps through the ENV.
+
+Then:
+
+```elixir
+Routemaster.Fetcher.get("https://example.com/api/avocados/1337")
+Routemaster.Fetcher.get("https://otherapp.url/api/bananas/123", cache: false)
+```
+
+The `Fetcher` module integrates automatically with the cache service privided by the library, backed by Redis. If a resource for a given URL is already cached, no HTTP request is executed and the cached value is returned. The cache can be expired manually or automatically when the drain receives new events.
 
 ## Test
 
