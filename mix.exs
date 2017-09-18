@@ -16,6 +16,9 @@ defmodule Routemaster.Mixfile do
       preferred_cli_env: [espec: :test],
       elixirc_paths: elixirc_paths(Mix.env),
       dialyzer: dialyzer(),
+      description: description(),
+      package: package(),
+      docs: docs(),
     ]
   end
 
@@ -67,4 +70,39 @@ defmodule Routemaster.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "spec/support"]
   defp elixirc_paths(:dev),  do: ["lib", "dev"]
   defp elixirc_paths(_),     do: ["lib"]
+
+
+  defp description do
+    """
+    Elixir client for the Routemaster event bus server.
+
+    Supports publishing events, subscribing to topics, receiving and processing events.
+    Also incluses a HTTP client integrated with a builtin cache service.
+    """
+  end
+
+
+  defp package do
+    [
+      maintainers: [
+        "Tommaso Pavese"
+      ],
+      licenses: [
+        "MIT"
+      ],
+      links: %{
+        "GitHub" => "https://github.com/deliveroo/routemaster-client-ex",
+      }
+    ]
+  end
+
+
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme",
+      source_url: "https://github.com/deliveroo/routemaster-client-ex/",
+      source_ref: "v#{@version}"
+    ]
+  end
 end
