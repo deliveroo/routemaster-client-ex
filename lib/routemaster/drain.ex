@@ -36,11 +36,13 @@ defmodule Routemaster.Drain do
   defmodule MyApp.MyDrainApp do
     use Routemaster.Drain
 
+    drain Routemaster.Drains.Siphon, topic: "burgers", to: MyApp.BurgerSiphon
     drain Routemaster.Drains.Dedup
     drain Routemaster.Drains.IgnoreStale
     drain :a_function_plug, some: "options"
     drain Routemaster.Drains.FetchAndCache
     drain MyApp.MyCustomDrain, some: "other options"
+    drain Routemaster.Drains.Notify, listener: MyApp.EventsSink
 
     def a_function_plug(conn, opts) do
       {:ok, stuff} = MyApp.Utils.do_something(conn.assigns.events, opts[:some])

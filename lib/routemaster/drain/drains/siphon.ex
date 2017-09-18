@@ -37,7 +37,7 @@ defmodule Routemaster.Drains.Siphon do
   alias Routemaster.Drains.Siphon
 
   drain Siphon, topic: "burgers", to: BurgerSiphon
-  drain Siphon, topics: ~(coke fanta), to: DrinksSiphon
+  drain Siphon, topics: ~w(coke fanta), to: DrinksSiphon
   ```
   """
 
