@@ -30,7 +30,7 @@ This Elixir package is a client for the [Routemaster](https://github.com/deliver
 
 The package is organized in four main functional areas:
 
-* `Routemaster.Drain`, a [Plug](https://github.com/elixir-lang/plug) app builder to receive events over HTTP.
+* `Routemaster.Drain`, a [Plug](https://github.com/elixir-lang/plug) app builder to set up endpoints to receive events over HTTP.
 * `Routemaster.Fetcher`, a HATEOAS API client to get entities from other services.
 * `Routemaster.Publisher`, a module to publish events to the event bus.
 * `Routemaster.Director`, an interface to subscribe to topics, unsubscribe, list and delete (owned) topics, and in general interact with the API of the server.
