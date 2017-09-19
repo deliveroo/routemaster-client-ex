@@ -1,13 +1,14 @@
 defmodule Routemaster.Mixfile do
   use Mix.Project
 
-  @version "0.0.1"
+  @version "0.1.0"
 
   def version, do: @version
 
   def project do
     [
       app: :routemaster,
+      name: "Routemaster Client",
       version: @version,
       elixir: "~> 1.5",
       build_embedded: Mix.env == :prod,
@@ -84,6 +85,7 @@ defmodule Routemaster.Mixfile do
 
   defp package do
     [
+      name: "routemaster_client",
       maintainers: [
         "Tommaso Pavese"
       ],

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.1.0
 
 First public release of the library.
 At a high level, from the beginning of the readme:
