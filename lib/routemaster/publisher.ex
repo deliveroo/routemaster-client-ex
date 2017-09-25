@@ -32,6 +32,8 @@ defmodule Routemaster.Publisher do
   #
   # plug Tesla.Middleware.DebugLogger
 
+  @supervisor EventPublishers.TaskSupervisor
+
 
   @event_types ~w(create update delete noop)
 
@@ -60,10 +62,11 @@ defmodule Routemaster.Publisher do
   * options, an optional keyword list with:
     * `timestamp`: an integer unix timestamp.
     * `data`: any extra payload for the event, must be serializable as JSON.
+    * `async`: whether the event should be published in a supervised background `Task`.
 
   """
   @spec send_event(binary, binary, binary, Keyword.t) :: :ok | {:error, http_status}
-  def send_event(topic, event, url, options \\ [timestamp: nil, data: nil]) do
+  def send_event(topic, event, url, options \\ [timestamp: nil, data: nil, async: nil]) do
     Topic.validate_name! topic
     # Set the timestamp early, if missing. This will ensure that it's set
     # close to the actual event generation time even if the rest of this
@@ -74,11 +77,28 @@ defmodule Routemaster.Publisher do
     payload = Event.build(event, url, time, options[:data])
     Event.validate!(payload)
 
+    if options[:async] do
+      _send_async(topic, payload)
+    else
+      _send_sync(topic, payload)
+    end
+  end
+
+
+  defp _send_sync(topic, payload) do
     case post("/topics/#{topic}", payload) do
       %{status: 200} ->
         :ok
       %{status: status} ->
         {:error, status}
     end
+  end
+
+
+  defp _send_async(topic, payload) do
+    Task.Supervisor.start_child(@supervisor, fn() ->
+      _send_sync(topic, payload)
+    end)
+    :ok
   end
 end

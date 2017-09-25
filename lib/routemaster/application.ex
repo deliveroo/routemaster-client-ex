@@ -51,6 +51,16 @@ defmodule Routemaster.Application do
         ]],
         [id: :drain_pipelines_task_supervisor]
       ),
+
+      # To publish events asyncronously.
+      #
+      supervisor(Task.Supervisor,
+        [[
+          name: EventPublishers.TaskSupervisor,
+          restart: :transient,
+        ]],
+        [id: :event_publishers_task_supervisor]
+      ),
     ]
 
     opts = [strategy: :one_for_one, name: Routemaster.Supervisor]
