@@ -20,6 +20,7 @@ defmodule Routemaster.PublisherSpec do
   @topic "hamsters"
   @url "https://foo.bar/1"
   @data %{"foo" => "bar"}
+  @async_wait_for 50
 
   describe "send_event()" do
     it "sets the correct user-agent HTTP header" do
@@ -60,11 +61,13 @@ defmodule Routemaster.PublisherSpec do
           end
         end
 
+        subject(Publisher.send_event(@topic, "noop", @url))
+
         context "with a NON successful request" do
           let :status, do: 400
 
           it "returns {:error, http_status}" do
-            expect Publisher.send_event(@topic, "noop", @url) |> to(eq {:error, 400})
+            expect subject() |> to(eq {:error, 400})
           end
         end
 
@@ -72,7 +75,29 @@ defmodule Routemaster.PublisherSpec do
           let :status, do: 200
 
           it "returns :ok" do
-            expect Publisher.send_event(@topic, "noop", @url) |> to(eq :ok)
+            expect subject() |> to(eq :ok)
+          end
+        end
+
+        describe "when event publication is asynchronous" do
+          subject(Publisher.send_event(@topic, "noop", @url, async: true))
+
+          context "with a NON successful request" do
+            let :status, do: 400
+
+            it "returns :ok" do
+              expect subject() |> to(eq :ok)
+              :timer.sleep(@async_wait_for)
+            end
+          end
+
+          context "with a successful request" do
+            let :status, do: 200
+
+            it "returns :ok" do
+              expect subject() |> to(eq :ok)
+              :timer.sleep(@async_wait_for)
+            end
           end
         end
       end
@@ -167,9 +192,7 @@ defmodule Routemaster.PublisherSpec do
 
 
   describe "create()" do
-    subject(Publisher.create(@topic, "#{@url}/a", timestamp: 11111, data: @data))
-
-    it "sends a create event" do
+    before do
       Bypass.expect_once shared.bypass, "POST", "/topics/#{@topic}", fn(conn) ->
         payload = request_payload(conn)
 
@@ -180,16 +203,21 @@ defmodule Routemaster.PublisherSpec do
 
         Conn.resp(conn, 200, "")
       end
+    end
 
-      subject()
+    it "sends a create event (sync)" do
+      Publisher.create(@topic, "#{@url}/a", timestamp: 11111, data: @data)
+    end
+
+    it "sends a create event (async)" do
+      Publisher.create(@topic, "#{@url}/a", timestamp: 11111, data: @data, async: true)
+      :timer.sleep(@async_wait_for)
     end
   end
 
 
   describe "update()" do
-    subject(Publisher.update(@topic, "#{@url}/b", timestamp: 22222, data: @data))
-
-    it "sends an update event" do
+    before do
       Bypass.expect_once shared.bypass, "POST", "/topics/#{@topic}", fn(conn) ->
         payload = request_payload(conn)
 
@@ -200,16 +228,21 @@ defmodule Routemaster.PublisherSpec do
 
         Conn.resp(conn, 200, "")
       end
+    end
 
-      subject()
+    it "sends an update event (sync)" do
+      Publisher.update(@topic, "#{@url}/b", timestamp: 22222, data: @data)
+    end
+
+    it "sends an update event (async)" do
+      Publisher.update(@topic, "#{@url}/b", timestamp: 22222, data: @data, async: true)
+      :timer.sleep(@async_wait_for)
     end
   end
 
 
   describe "delete()" do
-    subject(Publisher.delete(@topic, "#{@url}/c", timestamp: 33333, data: @data))
-
-    it "sends a delete event" do
+    before do
       Bypass.expect_once shared.bypass, "POST", "/topics/#{@topic}", fn(conn) ->
         payload = request_payload(conn)
 
@@ -220,16 +253,21 @@ defmodule Routemaster.PublisherSpec do
 
         Conn.resp(conn, 200, "")
       end
+    end
 
-      subject()
+    it "sends a delete event (sync)" do
+      Publisher.delete(@topic, "#{@url}/c", timestamp: 33333, data: @data)
+    end
+
+    it "sends a delete event (async)" do
+      Publisher.delete(@topic, "#{@url}/c", timestamp: 33333, data: @data, async: true)
+      :timer.sleep(@async_wait_for)
     end
   end
 
 
   describe "noop()" do
-    subject(Publisher.noop(@topic, "#{@url}/d", timestamp: 44444, data: @data))
-
-    it "sends a noop event" do
+    before do
       Bypass.expect_once shared.bypass, "POST", "/topics/#{@topic}", fn(conn) ->
         payload = request_payload(conn)
 
@@ -240,8 +278,15 @@ defmodule Routemaster.PublisherSpec do
 
         Conn.resp(conn, 200, "")
       end
+    end
 
-      subject()
+    it "sends a noop event (sync)" do
+      Publisher.noop(@topic, "#{@url}/d", timestamp: 44444, data: @data)
+    end
+
+    it "sends a noop event (async)" do
+      Publisher.noop(@topic, "#{@url}/d", timestamp: 44444, data: @data, async: true)
+      :timer.sleep(@async_wait_for)
     end
   end
 end
