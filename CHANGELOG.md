@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+Features:
+
+* Added support to publish events asynchronously with the new `async: true` option for the `Publisher` functions.
+
 ## v0.1.0
 
 First public release of the library.
