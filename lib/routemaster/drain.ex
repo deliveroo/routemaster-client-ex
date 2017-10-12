@@ -63,9 +63,9 @@ defmodule Routemaster.Drain do
 
   Just like with the `Plug.Builder.plug/2` macro, multiple plugs can be defined
   with the `drain/2` macro, and the plugs in the Drain pipeline will be executed
-  in the order they've been added. In the example above, `Routemaster.Drains.Dedup`
-  will be called first, followed by `Routemaster.Drains.IgnoreStale`, then the
-  `:a_function_plug` function and so on.
+  in the order they've been added. In the example above, `Routemaster.Drains.Siphon`
+  will be called first, followed by `Routemaster.Drains.Dedup`, then
+  `Routemaster.Drains.IgnoreStale`, then the `:a_function_plug` function and so on.
 
   Again, the second drain pipeline is anynchronous and independent from the main
   plug pipeline. The original HTTP POST request that delivers the batch of events
