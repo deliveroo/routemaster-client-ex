@@ -47,11 +47,11 @@ defmodule Routemaster.Mixfile do
       {:plug, "~> 1.4"},
       {:cowboy, "~> 1.1", optional: true},
       {:poison, "~> 3.1"},
-      {:tesla, "~> 0.7"},
-      {:hackney, "~> 1.8"},
+      {:tesla, "~> 0.9"},
+      {:hackney, "~> 1.9"},
       {:deferred_config, "~> 0.1.1", optional: true},
 
-      {:ex_doc, "~> 0.16", only: :dev},
+      {:ex_doc, "~> 0.17", only: :dev},
       {:dialyxir, "~> 0.5", only: :dev, runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
 

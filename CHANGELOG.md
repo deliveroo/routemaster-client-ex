@@ -2,9 +2,14 @@
 
 ## Unreleased
 
-Features:
+Enancements:
 
 * Added support to publish events asynchronously with the new `async: true` option for the `Publisher` functions.
+
+Other Changes:
+
+* Documentation fixes.
+* Updated dependencies.
 
 ## v0.1.0
 
