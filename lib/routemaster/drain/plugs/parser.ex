@@ -47,8 +47,8 @@ defmodule Routemaster.Plugs.Parser do
 
 
   defp clean_the_params(conn) do
-    conn = %{conn | body_params: Map.delete(conn.body_params, "_json") }
-    conn = %{conn | params: Map.delete(conn.params, "_json") }
+    conn = %{conn | body_params: Map.delete(conn.body_params, "_json")}
+    conn = %{conn | params: Map.delete(conn.params, "_json")}
     conn
   end
 
