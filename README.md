@@ -170,6 +170,50 @@ end
 
 The Drain app takes care of its own authentication, and the host application should _not_ wrap it with any extra authentication logic.
 
+When used with Phoenix, an important configuration step is to make sure that the event bodies are not parsed twice. With the base configuration, in fact, the Phoenix endpoint contanis this declaration:
+
+```elixir
+defmodule MyApp.Endpoint do
+  use Phoenix.Endpoint, otp_app: :my_app
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["*/*"],
+    json_decoder: Poison
+
+  # ...
+end
+```
+
+While that is normally fine and it populates `conn.params["_json"]`, it also has the effect of removing the body from the `conn`. This means that the Drain JSON parser (which turns the payloads into structs) will have nothing to parse when it gets to handle the `conn`. To deal with this, it is required to remove the `Plug.Parsers` declaration from `endopoint.ex` and move it to `router.ex`, but only for the pipelines where it's required. For example:
+
+```elixir
+defmodule RmDemoWeb.Router do
+  use RmDemoWeb, :router
+
+  pipeline :browser do
+    plug Plug.Parsers, parsers: [:urlencoded, :multipart], pass: ["*/*"], json_decoder: Poison
+    # ...
+  end
+
+  pipeline :api do
+    plug Plug.Parsers, parsers: [:json], pass: ["*/*"], json_decoder: Poison
+    # ...
+  end
+
+  scope "/", RmDemoWeb do
+    pipe_through :browser
+    get "/", PageController, :index
+  end
+  
+  scope path: "/events" do
+    forward "/", RmDemoWeb.Drain
+  end
+end
+
+```
+
+
 ### Publish Events
 
 The `Publisher` allows to publish events to the bus server. First, the application must be configured [as shown in the section on the topics](#subscribe-to-topics). Then:
@@ -214,7 +258,7 @@ The package can be installed by adding `routemaster` to your list of dependencie
 ```elixir
 def deps do
   [
-    {:routemaster, "~> 0.2.0"},
+    {:routemaster, "~> 0.2.0", hex: :routemaster_client},
   ]
 end
 ```
