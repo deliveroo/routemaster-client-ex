@@ -16,18 +16,25 @@ defmodule Routemaster.Plugs.Parser do
 
   plug Plug.Parsers, parsers: [:json], json_decoder: Poison
 
-  # When decoding JSON with root-level arrays, Poison will merge in the params
-  # with a "_json" key. Here we extract them and move them in the assigns.
+  # If body_params is unfetched, then no parser has run yet.
+  # Here we call super() to run the parser configured in this
+  # module as a plug.
   #
   def call(conn = %{body_params: %Plug.Conn.Unfetched{}}, opts) do
     conn = super(conn, opts)
     decode_the_events(conn)
   end
 
+  # If the function call matches this, then a parser has
+  # already been run. Possibly we're in a Phoenix app.
+  #
   def call(conn, _opts) do
     decode_the_events(conn)
   end
 
+  # When decoding JSON with root-level arrays, Poison will merge in the params
+  # with a "_json" key. Here we extract them and move them in the assigns.
+  #
   defp decode_the_events(conn) do
     events =
       conn.params["_json"]
