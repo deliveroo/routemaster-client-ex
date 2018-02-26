@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-Fixes:
+Changes:
+
 * Ensure that `Plugs.RootPostOnly` does not accidentally block valid requests (it would happen because [`Phoenix.Router.forward/4`](https://hexdocs.pm/phoenix/Phoenix.Router.html#forward/4) does not strip `conn.request_path` when used in scopes.
+* The custom JSON parser used to assume that the request body on the `%Plug.Conn{}` hadn't been parsed yet. This was incompatible with how a Phoenix app defaults to parsing all request bodies in the endpoint, before entering the router, and required some custom configuration in the host Phoenix app. This has now been changed and the custom JSON parser will work with both not-parsed-yet and pre-parsed request bodies.
 
 ## v0.2.0
 
