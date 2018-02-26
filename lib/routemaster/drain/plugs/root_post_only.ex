@@ -21,11 +21,11 @@ defmodule Routemaster.Plugs.RootPostOnly do
   def init(opts), do: opts
 
 
-  def call(conn = %{method: "POST", request_path: "/"}, _opts) do
+  def call(conn = %{method: "POST", path_info: []}, _opts) do
     conn
   end
 
-  def call(conn = %{request_path: "/"}, _opts) do
+  def call(conn = %{path_info: []}, _opts) do
     conn
     |> Conn.send_resp(405, "")
     |> Conn.halt()

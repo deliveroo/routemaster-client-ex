@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+Fixes:
+* Ensure that `Plugs.RootPostOnly` does not accidentally block valid requests (it would happen because [`Phoenix.Router.forward/4`](https://hexdocs.pm/phoenix/Phoenix.Router.html#forward/4) does not strip `conn.request_path` when used in scopes.
+
 ## v0.2.0
 
 Enancements:
