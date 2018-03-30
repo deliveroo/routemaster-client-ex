@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/deliveroo/routemaster-client-ex.svg?branch=master)](https://travis-ci.org/deliveroo/routemaster-client-ex)
 [![Hex.pm](https://img.shields.io/hexpm/v/routemaster_client.svg)](https://hex.pm/packages/routemaster_client)
-[![hexdocs.pm](https://img.shields.io/badge/docs-0.2.0-brightgreen.svg)](https://hexdocs.pm/routemaster_client)
+[![hexdocs.pm](https://img.shields.io/badge/docs-0.3.0-brightgreen.svg)](https://hexdocs.pm/routemaster_client)
 
 This Elixir package is a client for the [Routemaster](https://github.com/deliveroo/routemaster) event bus server application. It's a port of the Ruby clients, [routemaster-drain](https://github.com/deliveroo/routemaster-drain) and [routemaster-client](https://github.com/deliveroo/routemaster-client).
 
@@ -214,7 +214,7 @@ The package can be installed by adding `routemaster_client` to your list of depe
 ```elixir
 def deps do
   [
-    {:routemaster_client, "~> 0.2.0"},
+    {:routemaster_client, "~> 0.3.0"},
   ]
 end
 ```
