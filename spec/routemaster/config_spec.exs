@@ -13,13 +13,13 @@ defmodule Routemaster.ConfigSpec do
 
     before do
       # capture the initial configuration
-      initial_config = Application.get_env(:routemaster, :redis_cache)
+      initial_config = Application.get_env(:routemaster_client, :redis_cache)
       {:shared, initial_config: initial_config}
     end
 
     finally do
       # restore the initial configuration
-      Mix.Config.persist(routemaster: [redis_cache: shared.initial_config])
+      Mix.Config.persist(routemaster_client: [redis_cache: shared.initial_config])
     end
 
 
@@ -40,7 +40,7 @@ defmodule Routemaster.ConfigSpec do
     context "when configured with a string" do
       before do
         uri = "redis://42.42.42.42:1337/1"
-        Mix.Config.persist(routemaster: [redis_cache: uri])
+        Mix.Config.persist(routemaster_client: [redis_cache: uri])
         {:shared, uri: uri}
       end
 

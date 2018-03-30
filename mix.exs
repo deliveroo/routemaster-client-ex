@@ -7,7 +7,7 @@ defmodule Routemaster.Mixfile do
 
   def project do
     [
-      app: :routemaster,
+      app: :routemaster_client,
       name: "Routemaster Client",
       version: @version,
       elixir: "~> 1.5",

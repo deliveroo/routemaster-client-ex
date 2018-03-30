@@ -114,7 +114,7 @@ defmodule Routemaster.Drain do
 
       @doc false
       def init(opts) do
-        Application.ensure_started(:routemaster)
+        Application.ensure_started(:routemaster_client)
         super(opts)
       end
 

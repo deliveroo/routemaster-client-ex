@@ -51,24 +51,24 @@ An example:
 use Mix.Config
 
 # The Redis instances used for cache and data
-config :routemaster,
+config :routemaster_client,
   redis_cache: "redis://redis.host.one:6379/0",
   redis_data: "redis://redis.host.two:6379/0"
 
 # or
-config :routemaster,
+config :routemaster_client,
   redis_cache: [host: "redis.host.one", port: 6379, database: 0],
   redis_data: [host: "redis.host.two", port: 6379, database: 0]
 
-config :routemaster, :cache_ttl, "86400"
+config :routemaster_client, :cache_ttl, "86400"
 
-config :routemaster,
+config :routemaster_client,
   bus_url: "https://routemaster.server",
   bus_api_token: "bus-server-api-token",
   drain_url: "https://myapp.url/events",
   drain_token: "my-app--drain-auth-token"
 
-config :routemaster,
+config :routemaster_client,
   :service_auth_credentials,
   "example.com:username:auth-token,otherapp.url:other-username:other-auth-token"
 ```
@@ -89,7 +89,7 @@ The `Director` module provides functions to subscribe to and work with topics. F
 ```elixir
 use Mix.Config
 
-config :routemaster,
+config :routemaster_client,
   bus_url: "https://routemaster.server",
   bus_api_token: "bus-server-api-token",
   drain_url: "https://myapp.url/events",
@@ -193,7 +193,7 @@ use Mix.Config
 credentials =
   "example.com:username:auth-token,otherapp.url:other-username:other-auth-token"
 
-config :routemaster, service_auth_credentials: credentials
+config :routemaster_client, service_auth_credentials: credentials
 ```
 
 Currently they must be provided as a joined string to support configuring apps through the ENV.
@@ -209,12 +209,12 @@ The `Fetcher` module integrates automatically with the cache service privided by
 
 ## Installation
 
-The package can be installed by adding `routemaster` to your list of dependencies in `mix.exs`.
+The package can be installed by adding `routemaster_client` to your list of dependencies in `mix.exs`.
 
 ```elixir
 def deps do
   [
-    {:routemaster, "~> 0.2.0"},
+    {:routemaster_client, "~> 0.2.0"},
   ]
 end
 ```

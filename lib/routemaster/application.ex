@@ -19,7 +19,7 @@ defmodule Routemaster.Application do
       # deferred_config is an optional dependency,
       # and this block is always executed when
       # working on this library in development.
-      DeferredConfig.populate(:routemaster)
+      DeferredConfig.populate(:routemaster_client)
     end
 
     children = [

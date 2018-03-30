@@ -5,7 +5,7 @@ defmodule Routemaster.Config do
   require Logger
   alias Routemaster.Utils
 
-  @app :routemaster
+  @app :routemaster_client
 
   @default_redis_config [
     host: "localhost",
